@@ -6,7 +6,7 @@ var map;
  var line;
  var groupName = "group1"
  let counter = 0;
- //var server = "geonet.igg.uni-bonn.de";
+ //var server = "131.220.71.188:8080";
  var server = "localhost:8080";
  var markerLayer1;
  var markerLayer2;
@@ -215,31 +215,26 @@ function drawMultiModalPath(path) {
         map.removeLayer(line);
     }
 
-    // Yol listesi, yol id'leri ve noktaları tanımla
     var path_list = [];
     var path_ids = [];
     var points = [];
 
-    // Başlangıç noktasını al
     var startCoord = path[0].coordinate;
     var startPoint = ol.proj.fromLonLat([startCoord.y, startCoord.x]);
     path_ids.push(path[0].condition);
     points.push(startPoint);
 
-    // Yol boyunca döngü
     for (var i = 1; i < path.length; i++) {
         var pth = path[i];
         var coord = pth.coordinate;
         var point = ol.proj.fromLonLat([coord.y, coord.x]);
 
-        // Yol koşulları değiştiğinde yeni bir yolu başlat
         if (path[i - 1].condition != pth.condition && pth.condition != "arrival") {
             path_list.push(points);
             points = [];
             path_ids.push(pth.condition);
         }
 
-        // Noktaları işle
         if (pth.condition == "departure" || pth.condition == "arrival") {
             var pointFeature = new ol.Feature({
                 geometry: new ol.geom.Point(point)
@@ -259,7 +254,7 @@ function drawMultiModalPath(path) {
     }
     path_list.push(points);
 
-    // Yolları çiz
+    // draw path
     let flag = false;
     for (var i = 0; i < path_ids.length; i++) {
         var lineString = new ol.geom.LineString(path_list[i]);
@@ -282,108 +277,9 @@ function drawMultiModalPath(path) {
         oldLineList.push(line);
     }
 }
- /*function drawMultiModalPath(path) {
-      if (oldLineList.length>0){
-          oldLineList.forEach(item => map.removeLayer(item));
-          oldLineList = [];
-      }
-
-     if (line) {
-         map.removeLayer(line);
-     }
-     console.log(path[10])
-     var path_list = []
-     var path_ids = [];
-     var points = [];
-
-
-
-     var coord = path[0].coordinate;
-     var point = ol.proj.fromLonLat([coord.y, coord.x]);
-     path_ids.push(path[0].condition)
-     points.push(point);
-
-     for (var i = 1; i < path.length; i++) {
-         var pth = path[i];
-         if(path[i-1].condition != pth.condition && pth.condition != "arrival"){
-             path_list.push(points)
-             points  = []
-             path_ids.push(pth.condition)
-         }
-
-
-         var coord = pth.coordinate;
-         var point = ol.proj.fromLonLat([coord.y, coord.x]);
-         console.log(pth);
-         if(pth.condition == "departure"){
-             console.log(point);
-             var pointFeature = new ol.Feature({
-                 geometry: point
-             });
-             var vectorSource = new ol.source.Vector({
-                 features: [pointFeature]
-             });
-             pointLayer = new ol.layer.Vector({
-                 source: vectorSource
-             });
-             pointLayer.setStyle(departurePointStyle)
-             map.addLayer(pointLayer);
-             oldLineList.push(pointLayer);
-         }
-         if(pth.condition == "arrival"){
-             console.log(point);
-             var pointFeature = new ol.Feature({
-                 geometry: point
-             });
-             var vectorSource = new ol.source.Vector({
-                 features: [pointFeature]
-             });
-             pointLayer = new ol.layer.Vector({
-                 source: vectorSource
-             });
-             pointLayer.setStyle(arrivalPointStyle)
-             map.addLayer(pointLayer);
-             oldLineList.push(pointLayer);
-         }
-         points.push(point);
-     }
-     path_list.push(points);
-     console.log(path_ids);
-     let flag = false;
-     for(var i = 0;i<path_ids.length;i++){
-         var lineString = new ol.geom.LineString(path_list[i]);
-         var lineFeature = new ol.Feature({
-             geometry: lineString
-         });
-         if(path_ids[i] == "walk"){
-             lineFeature.setStyle(walkLineStyle)
-         }
-         else{
-
-             if(flag){
-                 lineFeature.setStyle(tramLineStyle)
-                 flag = false;
-             }else{
-                lineFeature.setStyle(busLineStyle)
-                 flag = true;
-             }
-
-         }
-         var vectorSource = new ol.source.Vector({
-             features: [lineFeature]
-         });
-         line = new ol.layer.Vector({
-             source: vectorSource
-         });
-         map.addLayer(line);
-         oldLineList.push(line);
-     }
- }
-*/
-
 
  document.getElementById('toggleBtn').addEventListener('change', function(e) {
-     routeMethod = e.target.checked ?  "multimodalroute" : "shortestpathjgrapht";
+     routeMethod = e.target.checked ?  "multimodalroute" : "shortestpath";
      console.log(routeMethod);
 
  } );
