@@ -148,32 +148,6 @@ public class MultiModalRouter<E_iso extends IsoEdge, E_road extends WalkingData>
 		}
 	}
 
-	public void runReverse(DiGraphNode<Point2D, E_road> originalTarget, long maxTime) {
-		DiGraphNode<IsoVertex, IsoEdge> target = road2routing.get(originalTarget);
-
-		NodeIterator<IsoVertex, IsoEdge> it = new ReversePublicTransportationIterator(transferNodes, transferTimes,
-				dijkstra, defaultTransferTime, starttime);
-		adj_it = new ReverseGeofabrikRoadIterator<>(it);
-		visit = new ReachabilityVisitor(starttime + maxTime, dijkstra);
-
-		dijkstra.run(target, visit, adj_it);
-		lastSource = routing2color.get(target);
-
-		double dist;
-		// road nodes are the first ones in the routing graph
-		for (int i = 0; i < numNodesRoad; ++i) {
-
-			dist = dijkstra.getDistance(routingGraph.getNode(i)) - starttime;
-
-			ColoredNode nodeData = coloredGraph.getNode(i).getNodeData();
-
-			if (dist <= maxTime) {
-				nodeData.setReachability(Colored.REACHABLE, maxTime - dist);
-			} else {
-				nodeData.setReachability(Colored.UNREACHABLE, -1);
-			}
-		}
-	}
 
 	/**
 	 * Starts a routing query which is stopped once the <code>originalTarget</code>
