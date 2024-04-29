@@ -10,7 +10,7 @@ var map;
  var server = "localhost:8080";
  var markerLayer1;
  var markerLayer2;
-
+const targetImgRes = fetch("https://cdn4.iconfinder.com/data/icons/small-n-flat/24/map-marker-1024.png");
  var leftBottom =  ol.proj.transform([7.004813999686911, 50.67771640948173], "EPSG:4326", "EPSG:3857");
  var rightTop = ol.proj.transform([7.19776199427912, 50.768218129933224], "EPSG:4326", "EPSG:3857");
  var minx = leftBottom[0];
@@ -32,14 +32,14 @@ var oldLineList = [];
  });
  var busLineStyle = new ol.style.Style({
      stroke: new ol.style.Stroke({
-         color: '#000000',
+         color: '#ec0909',
          width: 4,
          opacity: 1
      })
  });
  var tramLineStyle = new ol.style.Style({
      stroke: new ol.style.Stroke({
-         color: '#06dfe7',
+         color: '#0022ff',
          width: 4,
          opacity: 1
      })
@@ -76,14 +76,15 @@ marker1 = new ol.Feature({
   geometry: new ol.geom.Point(1,1)
 });
 
-const marker1Icon = 
+const marker1Icon =
   new ol.style.Style({
     image: new ol.style.Icon({
       crossOrigin: 'anonymous',
-      src: 'assets/source.png',
-      scale: "0.08"
+      src: 'https://cdn0.iconfinder.com/data/icons/aami-flat-map-pins-and-navigation/64/location-53-1024.png',
+      scale: "0.04"
     }),
 });
+
 marker1.setStyle(marker1Icon);
 
 marker2 = new ol.Feature({
@@ -93,8 +94,8 @@ const marker2Icon =
   new ol.style.Style({
     image: new ol.style.Icon({
       crossOrigin: 'anonymous',
-      src: 'assets/target.png',
-      scale: "0.08"
+      src: 'https://cdn4.iconfinder.com/data/icons/small-n-flat/24/map-marker-1024.png',
+      scale: "0.04"
     }),
   });
 marker2.setStyle(marker2Icon);
@@ -207,6 +208,7 @@ map.on("click", function (e) {
     });
     map.addLayer(line);
   }
+let ptCount =0;
 function drawMultiModalPath(path) {
     // Önceki katmanları temizle
     oldLineList.forEach(item => map.removeLayer(item));
@@ -255,15 +257,14 @@ function drawMultiModalPath(path) {
     path_list.push(points);
 
     // draw path
-    let flag = false;
     for (var i = 0; i < path_ids.length; i++) {
         var lineString = new ol.geom.LineString(path_list[i]);
         var lineFeature = new ol.Feature({
             geometry: lineString
         });
-        lineFeature.setStyle(path_ids[i] == "walk" ? walkLineStyle : (flag ? tramLineStyle : busLineStyle));
-        if(!flag){
-            flag = !flag;
+        lineFeature.setStyle(path_ids[i] == "walk" ? walkLineStyle : (ptCount%2 ==0 ? tramLineStyle : busLineStyle));
+        if(path_ids[i]!= "walk"){
+            ptCount +=1;
         }
 
 
@@ -285,20 +286,4 @@ function drawMultiModalPath(path) {
  } );
 
 
- // run static path
-const url = `http://${server}/${groupName}/ex1/static`;
 
-fetch(url)
-    .then(response => {
-        if (response.ok) {
-            return response.json();
-        } else {
-            throw new Error('Connection is unsuccessful.');
-        }
-    })
-    .then(data => {
-        drawPath(data);
-
-    })
-    .catch(error => {
-    });

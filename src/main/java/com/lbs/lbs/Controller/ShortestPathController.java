@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.lbs.lbs.Entity.TransportPath;
 import com.lbs.lbs.Service.ShortestPathService;
 import org.locationtech.jts.geom.Coordinate;
 import org.springframework.http.HttpStatus;
@@ -44,6 +45,21 @@ public class ShortestPathController {
 
         try {
             List<Coordinate> path = ShortestPathService.getShortestPath(lat1, lon1, lat2, lon2);
+            return new ResponseEntity(path, HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity(e.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
+        }
+
+    }
+    @GetMapping("/multimodalroute")
+    public ResponseEntity<List<Coordinate>> multiModalRouteController(@RequestParam double lat1,@RequestParam double lon1,@RequestParam double lat2,@RequestParam double lon2){
+        /**
+         * This Function's inputs are latitude and longitude, represents source and target locations
+         * returns list of shortest path coordinates as latitude and longitude*/
+        long time = 36000;
+        try {
+            List<TransportPath> path = ShortestPathService.getMultiModalRoute(lat1, lon1, lat2, lon2,time);
+
             return new ResponseEntity(path, HttpStatus.OK);
         }catch (Exception e){
             return new ResponseEntity(e.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);

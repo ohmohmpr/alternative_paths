@@ -40,7 +40,6 @@ public class MultiModalGraphHolder {
     }
     private static MultiModalGraphHolder getMultiModalGraphHolder() throws Exception {
 
-        File roadShape = new File(path + "/road/bonnUTM.shp");
         File gtfsDir = new File(path + "/gtfs/");
 
 
