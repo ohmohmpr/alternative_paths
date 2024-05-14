@@ -4,10 +4,10 @@ var map;
  var marker1;
  var marker2;
  var line;
- var groupName = "group1"
+ var groupName = "lbs2024"
  let counter = 0;
- //var server = "131.220.71.188:8080";
- var server = "localhost:8080";
+ //var server = "https://geonet.igg.uni-bonn.de";
+ var server = "http://localhost:8080";
  var markerLayer1;
  var markerLayer2;
 const targetImgRes = fetch("https://cdn4.iconfinder.com/data/icons/small-n-flat/24/map-marker-1024.png");
@@ -39,7 +39,7 @@ var oldLineList = [];
  });
  var tramLineStyle = new ol.style.Style({
      stroke: new ol.style.Stroke({
-         color: '#0022ff',
+         color: '#40ff00',
          width: 4,
          opacity: 1
      })
@@ -80,8 +80,8 @@ const marker1Icon =
   new ol.style.Style({
     image: new ol.style.Icon({
       crossOrigin: 'anonymous',
-      src: 'https://cdn0.iconfinder.com/data/icons/aami-flat-map-pins-and-navigation/64/location-53-1024.png',
-      scale: "0.04"
+      src: 'https://cdn1.iconfinder.com/data/icons/web-55/32/web_1-1024.png',
+      scale: "0.03"
     }),
 });
 
@@ -94,7 +94,7 @@ const marker2Icon =
   new ol.style.Style({
     image: new ol.style.Icon({
       crossOrigin: 'anonymous',
-      src: 'https://cdn4.iconfinder.com/data/icons/small-n-flat/24/map-marker-1024.png',
+      src: 'https://cdn4.iconfinder.com/data/icons/twitter-29/512/157_Twitter_Location_Map-1024.png',
       scale: "0.04"
     }),
   });
@@ -147,7 +147,7 @@ map.on("click", function (e) {
 
 
   
-      const url = `http://${server}/${groupName}/ex1/${routeMethod}?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
+      const url = `${server}/${groupName}/ex1/${routeMethod}?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
 
     fetch(url)
             .then(response => {

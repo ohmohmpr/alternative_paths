@@ -63,4 +63,14 @@ public class TransportPath {
     public void setCondition(String condition) {
         this.condition = condition;
     }
+    @Override
+    public String toString() {
+        return "TransportPath{" +
+                "coordinate=" + coordinate +
+                ", time=" + time +
+                ", name='" + name + '\'' +
+                ", routeName='" + routeName + '\'' +
+                ", condition='" + condition + '\'' +
+                '}';
+    }
 }

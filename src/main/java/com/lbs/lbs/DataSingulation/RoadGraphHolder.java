@@ -31,7 +31,7 @@ public class RoadGraphHolder {
     private STRtree roadTree;
     private static RoadGraphHolder instance;
 
-    public static RoadGraphHolder getInstance() {
+    public static RoadGraphHolder getInstance() throws Exception {
         if(instance==null){
             System.out.println("graph reading");
             instance = getRoadGraphHolder();
@@ -39,7 +39,7 @@ public class RoadGraphHolder {
         return instance;
     }
 
-    private static RoadGraphHolder getRoadGraphHolder(){
+    private static RoadGraphHolder getRoadGraphHolder() throws Exception {
         RoadGraphHolder roadGraphHolder = new RoadGraphHolder();
 
         File roadShape = new File(path+"/road/bonnUTM.shp");
@@ -50,7 +50,7 @@ public class RoadGraphHolder {
             ShapeFileReader.reduceToBiggestComponent(roadGraph);
             roadGraphHolder.setRoadGraph(roadGraph);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw e;
         }
 
         STRtree strTree = new STRtree();

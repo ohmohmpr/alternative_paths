@@ -42,11 +42,7 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.jgrapht</groupId>
-            <artifactId>jgrapht-core</artifactId>
-            <version>1.5.1</version>
-        </dependency>
+
         <dependency>
             <groupId>org.locationtech.geotrellis</groupId>
             <artifactId>geotrellis-proj4_2.12</artifactId>
@@ -65,14 +61,13 @@
 
         </dependency>
 
+        <!-- Dependency for com.vividsolutions:jump:1.2 -->
         <dependency>
-
             <groupId>com.vividsolutions</groupId>
             <artifactId>jump</artifactId>
             <version>1.2</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/jump-core.jar</systemPath>
-
         </dependency>
         <dependency>
 
@@ -87,15 +82,18 @@
         <dependency>
             <groupId>kd</groupId>
             <artifactId>kd</artifactId>
-            <version>1.0</version>
+            <version>1.0</version> <!-- You can specify any version you want -->
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/kd.jar</systemPath>
         </dependency>
 
+
+
     </dependencies>
 
     <build>
-        <finalName>lbsproject</finalName>
+        <finalName>lbs2024</finalName>
+
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -110,17 +108,34 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.3.1</version>
+                <configuration>
+                    <webResources>
+                        <resource>
+                            <directory>${project.basedir}/lib</directory>
+                            <targetPath>WEB-INF/lib</targetPath>
+                            <includes>
+                                <include>*.jar</include>
+                            </includes>
+                        </resource>
+                    </webResources>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.tomcat.maven</groupId>
                 <artifactId>tomcat7-maven-plugin</artifactId>
                 <version>2.2</version>
                 <configuration>
-                    <url>http://131.220.71.188:8080/manager/text</url>
-                    <server>lbs2023</server>
-                    <path>/group1</path>
+                    <url>https://geonet.igg.uni-bonn.de/manager/text</url> <!--Remote Tomcat Server address-->
+                    <server>lbs2023</server> <!--Remote Tomcat Server Name-->
+                    <path>/lbs2024</path> <!-- Group Name -->
                 </configuration>
             </plugin>
         </plugins>
     </build>
+
 
 
 </project>

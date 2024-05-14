@@ -26,20 +26,20 @@ public class MultiModalGraphHolder {
     private MultiModalRouter<GeofabrikData, GeofabrikData> multiModalGraph;
     private static MultiModalGraphHolder instance;
 
-    public static MultiModalGraphHolder getInstance() {
+    public static MultiModalGraphHolder getInstance() throws Exception {
 
         if(instance == null){
             try{
 
                 instance = getMultiModalGraphHolder();
             }catch (Exception e){
-                System.out.printf("Failed to Create Multimodal Graph : " +e.getMessage());
+                throw e;
             }
         }
         return instance;
     }
     private static MultiModalGraphHolder getMultiModalGraphHolder() throws Exception {
-
+        try{
         File gtfsDir = new File(path + "/gtfs/");
 
 
@@ -50,6 +50,9 @@ public class MultiModalGraphHolder {
         MultiModalGraphHolder multiModalGraphHolder = new MultiModalGraphHolder();
         multiModalGraphHolder.setMultiModalGraph(router);
         return multiModalGraphHolder;
+        }catch (Exception e){
+            throw e;
+        }
     }
 
     public MultiModalRouter<GeofabrikData, GeofabrikData> getMultiModalGraph() {
