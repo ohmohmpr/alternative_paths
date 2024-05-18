@@ -4,10 +4,13 @@ var map;
  var marker1;
  var marker2;
  var line;
- var groupName = "group1"
+ var groupName = "lbsproject-ohm"
  let counter = 0;
- //var server = "131.220.71.188:8080";
- var server = "localhost:8080";
+// var server = "131.220.71.188:8080";
+// for production
+// var server = "https://geonet.igg.uni-bonn.de"; 
+// for localhost
+ var server = "http://localhost:8080";
  var markerLayer1;
  var markerLayer2;
 const targetImgRes = fetch("https://cdn4.iconfinder.com/data/icons/small-n-flat/24/map-marker-1024.png");
@@ -147,7 +150,8 @@ map.on("click", function (e) {
 
 
   
-      const url = `http://${server}/${groupName}/ex1/${routeMethod}?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
+      //const url = `http://${server}/${groupName}/ex1/${routeMethod}?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
+      const url = `${server}/${groupName}/ex1/${routeMethod}?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
 
     fetch(url)
             .then(response => {

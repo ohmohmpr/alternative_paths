@@ -95,7 +95,7 @@
     </dependencies>
 
     <build>
-        <finalName>lbsproject</finalName>
+        <finalName>lbsproject-ohm</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -114,11 +114,27 @@
                 <artifactId>tomcat7-maven-plugin</artifactId>
                 <version>2.2</version>
                 <configuration>
-                    <url>http://131.220.71.188:8080/manager/text</url>
+                    <url>https://geonet.igg.uni-bonn.de/manager/text</url>
                     <server>lbs2023</server>
-                    <path>/group1</path>
+                    <path>/lbsproject-ohm</path>
                 </configuration>
             </plugin>
+            <plugin>
+			    <groupId>org.apache.maven.plugins</groupId>
+			    <artifactId>maven-war-plugin</artifactId>
+			    <version>3.3.1</version>
+			    <configuration>
+			        <webResources>
+			            <resource>
+			                <directory>${project.basedir}/lib</directory>
+			                <targetPath>WEB-INF/lib</targetPath>
+			                <includes>
+			                    <include>*.jar</include>
+			                </includes>
+			            </resource>
+			        </webResources>
+			    </configuration>
+			</plugin>
         </plugins>
     </build>
 

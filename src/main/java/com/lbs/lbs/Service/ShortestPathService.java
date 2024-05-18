@@ -1,6 +1,7 @@
 package com.lbs.lbs.Service;
 
 import com.lbs.lbs.Base.graph.DiGraph;
+import com.lbs.lbs.Base.graph.DiGraph.DiGraphNode;
 import com.lbs.lbs.Base.graph.types.multimodal.*;
 import com.lbs.lbs.Base.routing.Dijkstra;
 import com.lbs.lbs.Base.routing.MultiModalRouter;
@@ -62,20 +63,30 @@ public class ShortestPathService {
 
 
     public static List<TransportPath> getMultiModalRoute(double lat1, double lon1, double lat2, double lon2,
-                                                         long time) {
+                                                         long time) throws Exception {
         // Similar to getShortestPath convert the coordinates and find the nearest node in the road graph
 
+        Coordinate source = LatLon2EN(lat1, lon1);
+        Coordinate target = LatLon2EN(lat2, lon2);
+        RoadGraphHolder graphHolder = RoadGraphHolder.getInstance();
+        DiGraph.DiGraphNode<Point2D, GeofabrikData> sourceNode = graphHolder.findNearestPoint(source);
+        DiGraph.DiGraphNode<Point2D, GeofabrikData> targetNode = graphHolder.findNearestPoint(target);
         /**
          * As you want to include the public transportation, take a look at the class MultiModalGraphHolder
          * Use the methods from MultiModalGraphHolder and MultiModalRouter
          */
-
+        
+        MultiModalGraphHolder multiGraphHolder = MultiModalGraphHolder.getInstance();
+        MultiModalRouter<GeofabrikData, GeofabrikData> router = multiGraphHolder.getMultiModalGraph();
+        
+        router.setStarttime(time);
+        List<DiGraph.DiGraphNode<IsoVertex, IsoEdge>>  path = router.run(sourceNode,targetNode);
 
          // return the route using the method "multiModalPath2TransportPath"
-
-
-        return null;
-
+//        for (DiGraph.DiGraphNode<IsoVertex, IsoEdge> p : path) {
+//        	System.out.print(p);
+//        }
+        return multiModalPath2TransportPath(path);
     }
 
     /**
@@ -85,37 +96,55 @@ public class ShortestPathService {
         List<TransportPath> transportPaths = new ArrayList<>();
         TransportPath transportPath = null;
         // loop through all elements in route
-        /**
-         * The nodes from the MultiModalRoute can be one of four instances:
-         * - Point2D, TransferNode, ArrivalNode or DepartureNode
-         * Each of them needs to be handled a little different
-         */
+        for (DiGraph.DiGraphNode<IsoVertex, IsoEdge> r: route) {
+            /**
+             * The nodes from the MultiModalRoute can be one of four instances:
+             * - Point2D, TransferNode, ArrivalNode or DepartureNode
+             * Each of them needs to be handled a little different
+             */
+        	if (r.getNodeData() instanceof Point2D) {
+                /**
+                 *  If the node is a Point2D, convert the coordinates to LatLon
+                 *  and create a new TransportPath with the condition "walk"
+                 */
+        		Point2D walkNode = (Point2D) r.getNodeData();
+        		Coordinate c = EN2LatLon(walkNode.getX(), walkNode.getY());
+        		transportPath = new TransportPath(c, null, null, null, "walk");
+        	} else if (r.getNodeData() instanceof TransferNode){
+                /**
+                 *  If the node is a TransferNode, continue
+                 */
+        		continue;
+        	} else if (r.getNodeData() instanceof ArrivalNode) {
+                /**
+                 *  If the node is a ArrivalNode, get the node in the node from the road network,
+                 *  convert it to Point2D, convert the coordinates to LatLon and create a
+                 *  new TransportPath with the condition "arrival"
+                 */
+        		ArrivalNode arrivalNode = (ArrivalNode) r.getNodeData();
+        		Point2D point = (Point2D) arrivalNode.getNextStreetNode().getNodeData();
+        		Coordinate c = EN2LatLon(point.getX(), point.getY());
+        		transportPath = new TransportPath(c, arrivalNode.getTime(), arrivalNode.getName(), arrivalNode.getRoute_name(), "arrival");
+        	} else if (r.getNodeData() instanceof DepartureNode) {
+                /**
+                 *  If the node is a DepartureNode, check if there are other nodes in the result list already
+                 *  and if the last transportPath has the condition "arrival" -> If so, continue
+                 */
+        		TransportPath previousTransportPath = transportPaths.get(transportPaths.size() - 1);
+        		if (previousTransportPath.getCondition().equals("arrival")) {
+        			continue;
+        		}
+        		DepartureNode departureNode = (DepartureNode) r.getNodeData();
+        		transportPath = new TransportPath(previousTransportPath.getCoordinate(), departureNode.getTime(), departureNode.getName(), departureNode.getTripId(), "departure");
+        	}
+            /**
+             *  Get the node data and the last point from the result list and
+             *  create a new TransportPath using the coordinates from the last point and the condition departure
+             */
+            // append the result list
+            transportPaths.add(transportPath);
+        }
 
-        /**
-         *  If the node is a Point2D, convert the coordinates to LatLon
-         *  and create a new TransportPath with the condition "walk"
-         */
-
-        /**
-         *  If the node is a TransferNode, continue
-         */
-
-        /**
-         *  If the node is a ArrivalNode, get the node in the node from the road network,
-         *  convert it to Point2D, convert the coordinates to LatLon and create a
-         *  new TransportPath with the condition "arrival"
-         */
-
-        /**
-         *  If the node is a DepartureNode, check if there are other nodes in the result list already
-         *  and if the last transportPath has the condition "arrival" -> If so, continue
-         */
-        /**
-         *  Get the node data and the last point from the result list and
-         *  create a new TransportPath using the coordinates from the last point and the condition departure
-         */
-        // append the result list
-        transportPaths.add(transportPath);
 
     // return
 		return transportPaths;
