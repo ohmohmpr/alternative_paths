@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Validated
@@ -19,6 +20,7 @@ import java.util.List;
 @CrossOrigin
 @RequestMapping("/ex1")
 public class ShortestPathController {
+
     @GetMapping("/static")
     public ResponseEntity<List<Coordinate>> staticShortestPathController(){
 
@@ -52,7 +54,10 @@ public class ShortestPathController {
 
     }
     @GetMapping("/multimodalroute")
-    public ResponseEntity<List<Coordinate>> multiModalRouteController(@RequestParam double lat1,@RequestParam double lon1,@RequestParam double lat2,@RequestParam double lon2){
+    public ResponseEntity<List<Coordinate>> multiModalRouteController(@RequestParam double lat1,
+                                                                      @RequestParam double lon1,
+                                                                      @RequestParam double lat2,
+                                                                      @RequestParam double lon2){
         /**
          * This Function's inputs are latitude and longitude, represents source and target locations
          * returns list of shortest path coordinates as latitude and longitude*/
@@ -66,8 +71,20 @@ public class ShortestPathController {
         }
 
     }
+    @GetMapping("/alternative")
+    public ResponseEntity<List<List<TransportPath>>> getAlternativeRoutes(@RequestParam double lat1,
+                                                                          @RequestParam double lon1,
+                                                                          @RequestParam double lat2,
+                                                                          @RequestParam double lon2) throws Exception {
 
 
+        try {
+            List<List<TransportPath>> alternatives = ShortestPathService.getAlternativeRoutes(lat1, lon1, lat2,lon2,36000);
 
+            return new ResponseEntity(alternatives, HttpStatus.OK);
 
+        }catch (Exception e){
+            return new ResponseEntity(e.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
+        }
+    }
 }
