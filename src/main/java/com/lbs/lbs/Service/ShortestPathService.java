@@ -49,8 +49,9 @@ public class ShortestPathService {
             // Dijkstra class path is Base/routing/Dijkstra, check the construction parameters
             // and find how to run Dijkstra
 
-        Dijkstra dj = new Dijkstra(graphHolder.getRoadGraph());
-        dj.run(sourceNode,targetNode);
+        Dijkstra<Point2D, GeofabrikData> dj = new Dijkstra<Point2D, GeofabrikData>(graphHolder.getRoadGraph());
+        double length = dj.run(sourceNode,targetNode);
+//        System.out.println(length);
         List<DiGraph.DiGraphNode<Point2D, GeofabrikData>> path = dj.getPath(targetNode);
         List<Coordinate> returnList = new ArrayList<>();
         returnList.add(new Coordinate(lat1,lon1));

@@ -4,7 +4,7 @@ var map;
  var marker1;
  var marker2;
  var line;
- var groupName = "lbs2024"
+ var groupName = "lbsproject-ohm"
  let counter = 0;
  //var server = "https://geonet.igg.uni-bonn.de";
  var server = "http://localhost:8080";

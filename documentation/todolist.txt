@@ -1,2 +1,12 @@
 1. BiDi
 2. BDV
+3. write doc as md extensio
+4. write doc about how DI works
+5. show diff using git
+6. visualize on a map
+
+lr:
+1. configure git.
+2. 
+
+window > show view > markdown view > markdown source and preview (next to console below the main editor)

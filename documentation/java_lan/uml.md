@@ -1,0 +1,1 @@
+[how to write static in UML diagram](https://icarus.cs.weber.edu/~dab/cs1410/textbook/9.Classes_And_Objects/static.html)
