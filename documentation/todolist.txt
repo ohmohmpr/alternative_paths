@@ -6,7 +6,7 @@
 6. visualize on a map
 
 lr:
-1. configure git.
+1. understand diikstra class
 2. 
 
 window > show view > markdown view > markdown source and preview (next to console below the main editor)
