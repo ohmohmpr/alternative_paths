@@ -48,11 +48,54 @@ public class ShortestPathController {
         try {
             List<Coordinate> path = ShortestPathService.getShortestPath(lat1, lon1, lat2, lon2);
             return new ResponseEntity(path, HttpStatus.OK);
-        }catch (Exception e){
+        } catch (Exception e){
             return new ResponseEntity(e.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
         }
 
     }
+    
+
+    @GetMapping("/explorednodes")
+    public ResponseEntity<List<Coordinate>> exploredNodesController(@RequestParam double lat1,@RequestParam double lon1,@RequestParam double lat2,@RequestParam double lon2){
+        try {
+            List<Coordinate> path = ShortestPathService.getExploredNodes(lat1, lon1, lat2, lon2);
+        	System.out.println(HttpStatus.OK);
+            return new ResponseEntity(path, HttpStatus.OK);
+        } catch (Exception e){
+        	System.out.println(e);
+            return new ResponseEntity(e.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
+        }
+    }
+
+
+    @GetMapping("/shortestpathbidi")
+    public ResponseEntity<List<Coordinate>> simpleShortestPathBiDiController(@RequestParam double lat1,@RequestParam double lon1,@RequestParam double lat2,@RequestParam double lon2){
+        /**
+         * This Function's inputs are latitude and longitude, represents source and target locations
+         * returns list of the shortest path coordinates as latitude and longitude*/
+
+        try {
+            List<Coordinate> path = ShortestPathService.getShortestPathBiDi(lat1, lon1, lat2, lon2);
+            return new ResponseEntity(path, HttpStatus.OK);
+        } catch (Exception e){
+            return new ResponseEntity(e.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
+        }
+
+    }
+    
+
+    @GetMapping("/explorednodesbidi")
+    public ResponseEntity<List<Coordinate>> getExploredNodesBiDi(@RequestParam double lat1,@RequestParam double lon1,@RequestParam double lat2,@RequestParam double lon2){
+        try {
+            List<Coordinate> path = ShortestPathService.getExploredNodesBiDi(lat1, lon1, lat2, lon2);
+        	System.out.println(HttpStatus.OK);
+            return new ResponseEntity(path, HttpStatus.OK);
+        } catch (Exception e){
+        	System.out.println(e);
+            return new ResponseEntity(e.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
+        }
+    }
+
     @GetMapping("/multimodalroute")
     public ResponseEntity<List<Coordinate>> multiModalRouteController(@RequestParam double lat1,
                                                                       @RequestParam double lon1,
