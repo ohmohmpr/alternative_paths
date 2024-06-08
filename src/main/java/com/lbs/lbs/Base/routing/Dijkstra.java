@@ -171,6 +171,21 @@ public class Dijkstra<V, E extends WeightedArcData> {
 
 		return new ArrayList<DiGraphNode<V, E>>(path);
 	}
+	
+	public List<DiGraphNode<V, E>> getExploredNodes(DiGraphNode<V, E> target) {
+		LinkedList<DiGraphNode<V, E>> path = new LinkedList<DiGraphNode<V, E>>();
+
+		if (stamps[target.getId()] < currentStamp) {
+			return new ArrayList<DiGraphNode<V, E>>();
+		}
+
+		for(int i=0;i<stamps.length;i++)
+			if (stamps[i] > 0) {
+				path.addFirst(pred[i]);
+			}
+		
+		return new ArrayList<DiGraphNode<V, E>>(path);
+	}
 
 	public List<DiGraphArc<V, E>> getPathArcs(DiGraphNode<V, E> target) {
 		LinkedList<DiGraphArc<V, E>> path = new LinkedList<DiGraphArc<V, E>>();
