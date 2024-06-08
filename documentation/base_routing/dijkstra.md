@@ -28,6 +28,7 @@ length of this graph is 10000
 1. currentStamp = 
 2. curr_dist =
 
+stamps all zeros
 
 ## methods
 
