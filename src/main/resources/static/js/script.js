@@ -148,12 +148,12 @@ map.on("click", function (e) {
 
 
   	// get shortest
-//      const url = `${server}/${groupName}/ex1/${routeMethod}bdv?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
-//      const url_explorednodes = `${server}/${groupName}/ex1/explorednodesbdv?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
+//      const url = `${server}/${groupName}/ex1/${routeMethod}bidi?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
+//      const url_explorednodes = `${server}/${groupName}/ex1/explorednodesbidi?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
 
   	// get alternatives
       const url = `${server}/${groupName}/ex1/alternativebdv?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
-      const url_explorednodes = `${server}/${groupName}/ex1/explorednodesbdv?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
+//      const url_explorednodes = `${server}/${groupName}/ex1/explorednodesbdv?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
 
     fetch(url)
             .then(response => {
@@ -165,9 +165,9 @@ map.on("click", function (e) {
             })
             .then(data => {
                 if (routeMethod != "multimodalroute") {
-                    drawPath(data[0]);
-                    drawPath(data[1]);
-                    drawPath(data[2]);
+                    drawPath(data[0],'#0080ff');
+                    drawPath(data[1],"#FF0000");
+                    drawPath(data[2],"#008000");
                     console.log(data);
                 } else {
                     drawMultiModalPath(data)
@@ -198,7 +198,7 @@ map.on("click", function (e) {
 //				console.log(error)
 //            });
   }
-  function drawPath(path) {
+  function drawPath(path,colorCode) {
 //    if (line) {
 //      map.removeLayer(line);
 //    }
@@ -221,7 +221,7 @@ map.on("click", function (e) {
 
     var lineStyle = new ol.style.Style({
       stroke: new ol.style.Stroke({
-        color: '#0080ff',
+        color: colorCode,
         width: 4,
         opacity: 1,
         lineDash: [.1, 7]
