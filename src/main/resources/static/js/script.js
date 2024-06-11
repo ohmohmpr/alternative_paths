@@ -4,6 +4,7 @@ var map;
  var marker1;
  var marker2;
  var line;
+ var exploredNodes;
  var groupName = "lbsproject-ohm"
  let counter = 0;
  //var server = "https://geonet.igg.uni-bonn.de";
@@ -147,7 +148,8 @@ map.on("click", function (e) {
 
 
   
-      const url = `${server}/${groupName}/ex1/${routeMethod}?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
+      const url = `${server}/${groupName}/ex1/${routeMethod}bidi?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
+      const url_explorednodes = `${server}/${groupName}/ex1/explorednodesbidi?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
 
     fetch(url)
             .then(response => {
@@ -166,6 +168,26 @@ map.on("click", function (e) {
 
             })
             .catch(error => {
+            });
+            
+           
+    fetch(url_explorednodes)
+            .then(response => {
+              if (response.ok) {
+                return response.json();
+              } else {
+                throw new Error('Connection is unsuccessful.');
+              }
+            })
+            .then(data => {
+                if (routeMethod != "multimodalroute") {
+                    drawExploredNodes(data);
+                } else {
+                    drawMultiModalPath(data)
+                }
+            })
+            .catch(error => {
+				console.log(error)
             });
   }
   function drawPath(path) {
@@ -279,6 +301,55 @@ function drawMultiModalPath(path) {
     }
 }
 
+  function drawExploredNodes(path) {
+    if (exploredNodes) {
+      map.removeLayer(exploredNodes);
+    }
+    if (oldLineList.length>0){
+        oldLineList.forEach(item => map.removeLayer(item));
+        oldLineList = [];
+    }
+    var points = [];
+    for (var i = 0; i < path.length; i++) {
+      var coord = path[i];
+        var point = ol.proj.fromLonLat([coord.y, coord.x]);
+        points.push(point);
+    }
+
+	
+	marker3 = new ol.Feature({
+	  geometry: new ol.geom.MultiPoint(points)
+	});
+
+	const marker3Style =
+	  new ol.style.Style({
+		image: new ol.style.Circle({
+		      radius: 4,
+		      stroke: new ol.style.Stroke({
+		        color: '#0000ff'
+		      }),
+//		      fill: new ol.style.Fill({
+//		        color: '#00ff00'
+//		      })
+		    }),
+	});
+
+	try {
+	  marker3.setStyle(marker3Style);
+	  console.log("done");
+	}
+	catch(err) {
+	  console.log(err.message)
+	}
+	
+    marker3.getGeometry().setCoordinates(points);
+    exploredNodes = new ol.layer.Vector({
+      source: new ol.source.Vector({
+        features: [marker3]
+      })
+    });
+    map.addLayer(exploredNodes);
+  }
  document.getElementById('toggleBtn').addEventListener('change', function(e) {
      routeMethod = e.target.checked ?  "multimodalroute" : "shortestpath";
      console.log(routeMethod);
