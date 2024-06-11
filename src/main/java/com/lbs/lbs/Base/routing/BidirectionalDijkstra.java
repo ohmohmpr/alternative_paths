@@ -108,14 +108,14 @@ public class BidirectionalDijkstra<V, E extends WeightedArcData> {
 		MinHeap<DiGraphNode<V, E>> queue_B = new MinHeap<DiGraphNode<V, E>>();
 
 		items[source.getId()] = queue_F.insertItem(starttime, source);
-		items[source.getId()] = queue_B.insertItem(0, source);
+		items[target.getId()] = queue_B.insertItem(0, target);
 		stamps_F[source.getId()] = currentStamp;
 		stamps_B[target.getId()] = currentStamp;
 		
 		DiGraphNode<V, E> top_s = source;
 		DiGraphNode<V, E> top_t = target;
 		
-		while (dist_F[top_s.getId()] + dist_B[top_t.getId()] < mu) {
+		while (dist_F[top_s.getId()] + dist_B[top_t.getId()] < mu ) { //add queue_F.size() > 0 && queue_B.size() > 0
 			//extract the min of both searches
 			HeapItem<DiGraphNode<V, E>> item = queue_B.getMin();
 			if (dist_F[queue_F.getMin().getValue().getId()] <= dist_B[queue_B.getMin().getValue().getId()]){

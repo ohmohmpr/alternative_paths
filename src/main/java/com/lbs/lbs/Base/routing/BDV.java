@@ -16,7 +16,7 @@ import com.lbs.lbs.Base.util.MinHeap.HeapItem;
 
 public class BDV<V, E extends WeightedArcData> {
 
-
+	// Forward search
 	private double starttime = 0;
 	protected double dist_F[];
 	protected double curr_dist_F = 0;
@@ -24,6 +24,7 @@ public class BDV<V, E extends WeightedArcData> {
 	protected HeapItem<DiGraphNode<V, E>> items_F[];
 	public DiGraphNode<V, E> pred_F[];
 
+	// Backward search
 	protected double dist_B[];
 	protected double curr_dist_B = 0;
 	protected int stamps_B[];

@@ -145,15 +145,13 @@ map.on("click", function (e) {
     var lon2 = parseFloat(coord2[0]);
 
 
-
-
   	// get shortest
-//      const url = `${server}/${groupName}/ex1/${routeMethod}bdv?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
-//      const url_explorednodes = `${server}/${groupName}/ex1/explorednodesbdv?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
+      const url = `${server}/${groupName}/ex1/${routeMethod}bdv?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
+      const url_explorednodes = `${server}/${groupName}/ex1/explorednodesbdv?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
 
   	// get alternatives
-      const url = `${server}/${groupName}/ex1/alternativebdv?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
-      const url_explorednodes = `${server}/${groupName}/ex1/explorednodesbdv?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
+ //     const url = `${server}/${groupName}/ex1/alternativebdv?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
+  //    const url_explorednodes = `${server}/${groupName}/ex1/explorednodesbdv?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
 
     fetch(url)
             .then(response => {
