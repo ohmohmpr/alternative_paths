@@ -10,3 +10,62 @@ lr:
 2. 
 
 window > show view > markdown view > markdown source and preview (next to console below the main editor)
+
+
+
+stamps ... markiert ob schon mal geschaut
+items... Heapitems die in der queue sind oder mal waren
+
+Bidirectional_Dijkstra(WeightedGRaph G = (V,E,w), Vertex s, Vertex t)
+
+	Initialize(G,s)
+	Q_F = new PriorityQueue(V,d)
+	Q_B = new PriorityQueue(V,d)
+	
+	top_s = s
+	top_t = t
+	
+	mu = inf
+	
+	while d(top_s) + d(top_t) < mu do
+		if d(top_s) < d(top_t)
+			u = Q_F.ExtractMin()
+			top_s = u
+		else
+			u = Q_F.ExtractMin()
+			top_t = u
+			
+		foreach v from u.neighbors do
+			if v.d > u.d + w(u.,v) then
+				v.color = gray
+				v.d = u.d + w(u,v)
+				v.pi = u
+				Q.DecreaseKey(v,v.d)
+			
+		 u.color = black
+				
+		
+	
+	
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
