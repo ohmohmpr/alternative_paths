@@ -12,7 +12,7 @@ import com.lbs.lbs.Base.graph.types.WeightedArcData;
 import com.lbs.lbs.Base.util.MinHeap;
 import com.lbs.lbs.Base.util.MinHeap.HeapItem;
 
-public class BiDijkstra<V, E extends WeightedArcData> {
+public class BiDijkstraITRT<V, E extends WeightedArcData> {
 
 
 	private double starttime = 0;
@@ -34,7 +34,7 @@ public class BiDijkstra<V, E extends WeightedArcData> {
 	public int commonNodeID;
 	
 	@SuppressWarnings("unchecked")
-	public BiDijkstra(DiGraph<V, E> g) {
+	public BiDijkstraITRT(DiGraph<V, E> g) {
 		this.dist_F = new double[g.n()];
 		this.stamps_F = new int[g.n()];
 		this.items_F = new HeapItem[g.n()];

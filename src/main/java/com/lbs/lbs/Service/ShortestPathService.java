@@ -1,12 +1,16 @@
 package com.lbs.lbs.Service;
 
 import com.lbs.lbs.Base.graph.DiGraph;
+import com.lbs.lbs.Base.graph.DiGraph.DiGraphNode;
+import com.lbs.lbs.Base.graph.types.AlternativePaths;
 import com.lbs.lbs.Base.graph.types.RoadGraph;
 import com.lbs.lbs.Base.graph.types.multimodal.*;
 import com.lbs.lbs.Base.io.GeofabrikFactory;
 import com.lbs.lbs.Base.io.ShapeFileReader;
 import com.lbs.lbs.Base.routing.Dijkstra;
 import com.lbs.lbs.Base.routing.BiDijkstra;
+import com.lbs.lbs.Base.routing.BDV;
+import com.lbs.lbs.Base.routing.BiDijkstraITRT;
 import com.lbs.lbs.Base.routing.MultiModalRouter;
 import com.lbs.lbs.Base.routing.Router;
 import com.lbs.lbs.DataSingulation.MultiModalGraphHolder;
@@ -144,6 +148,162 @@ public class ShortestPathService {
         DiGraph.DiGraphNode<Point2D, GeofabrikData> targetNode = graphHolder.findNearestPoint(target);
 
         BiDijkstra<Point2D, GeofabrikData> dj = new BiDijkstra<Point2D, GeofabrikData>(graphHolder.getRoadGraph());
+        double length = dj.run(sourceNode,targetNode);
+//        System.out.println(length);
+        List<DiGraph.DiGraphNode<Point2D, GeofabrikData>> path = dj.getExploredNodes(targetNode);
+
+        List<Coordinate> returnList_nodes = new ArrayList<Coordinate>();
+
+        returnList_nodes.add(new Coordinate(lat1,lon1));
+        for(DiGraph.DiGraphNode<Point2D, GeofabrikData> p : path){
+        	if (p != null) {
+                returnList_nodes.add(EN2LatLon(p.getNodeData().getX(), p.getNodeData().getY()));
+        	}
+        }
+        returnList_nodes.add(new Coordinate(lat2,lon2));
+        
+        return returnList_nodes;
+    }
+    
+
+    public static List<List<Coordinate>>  getAlternativeRoutesBDV(double lat1,double lon1,double lat2, double lon2) throws Exception {
+
+        Coordinate source = LatLon2EN(lat1, lon1);
+        Coordinate target = LatLon2EN(lat2, lon2);
+
+        RoadGraphHolder graphHolder = RoadGraphHolder.getInstance();
+        DiGraph.DiGraphNode<Point2D, GeofabrikData> sourceNode = graphHolder.findNearestPoint(source);
+        DiGraph.DiGraphNode<Point2D, GeofabrikData> targetNode = graphHolder.findNearestPoint(target);
+
+        BDV<Point2D, GeofabrikData> dj = new BDV<Point2D, GeofabrikData>(graphHolder.getRoadGraph());
+        
+        dj.run(sourceNode,targetNode);
+//        dj.run(targetNode,sourceNode);
+        List<AlternativePaths<Point2D, GeofabrikData>> ALTpaths = dj.getPaths();
+        System.out.println("size = " + ALTpaths.size());
+
+        // --> The shortest path
+        AlternativePaths<Point2D, GeofabrikData> ALTpath1 = ALTpaths.get(0);
+        List<DiGraph.DiGraphNode<Point2D, GeofabrikData>> path1 = ALTpath1.path;
+        
+        List<Coordinate> returnList1 = new ArrayList<>();
+        returnList1.add(new Coordinate(lat1,lon1));
+        for(DiGraph.DiGraphNode<Point2D, GeofabrikData> p : path1){
+            returnList1.add(EN2LatLon(p.getNodeData().getX(),p.getNodeData().getY()));
+        }
+        returnList1.add(new Coordinate(lat2,lon2));
+        
+        
+        // --> The between shortest and longest of shortest paths.
+        AlternativePaths<Point2D, GeofabrikData> ALTpath2 = ALTpaths.get((int) (ALTpaths.size()/2));
+        List<DiGraph.DiGraphNode<Point2D, GeofabrikData>> path2 = ALTpath2.path;
+        
+        List<Coordinate> returnList2 = new ArrayList<>();
+        returnList2.add(new Coordinate(lat1,lon1));
+        for(DiGraph.DiGraphNode<Point2D, GeofabrikData> p : path2){
+            returnList2.add(EN2LatLon(p.getNodeData().getX(),p.getNodeData().getY()));
+        }
+        returnList2.add(new Coordinate(lat2,lon2));
+
+        
+        // --> The longest shortest path
+        AlternativePaths<Point2D, GeofabrikData> ALTpath3 = ALTpaths.get(ALTpaths.size() - 1);
+        System.out.println("ALTpaths.size() - 1 = " + (ALTpaths.size() - 1));
+        List<DiGraph.DiGraphNode<Point2D, GeofabrikData>> path3 = ALTpath3.path;
+        
+        List<Coordinate> returnList3 = new ArrayList<>();
+        returnList3.add(new Coordinate(lat1,lon1));
+        for(DiGraph.DiGraphNode<Point2D, GeofabrikData> p : path3){
+            returnList3.add(EN2LatLon(p.getNodeData().getX(),p.getNodeData().getY()));
+        }
+        returnList3.add(new Coordinate(lat2,lon2));
+
+        List<List<Coordinate>> returnListAltnative = new ArrayList<List<Coordinate>>();
+        returnListAltnative.add(returnList1);
+        returnListAltnative.add(returnList2);
+        returnListAltnative.add(returnList3);
+        
+        return returnListAltnative;
+    }
+    
+
+    public static List<Coordinate>  getExploredNodesBDV(double lat1,double lon1,double lat2, double lon2) throws Exception {
+
+        Coordinate source = LatLon2EN(lat1, lon1);
+        Coordinate target = LatLon2EN(lat2, lon2);
+
+        RoadGraphHolder graphHolder = RoadGraphHolder.getInstance();
+
+        DiGraph.DiGraphNode<Point2D, GeofabrikData> sourceNode = graphHolder.findNearestPoint(source);
+        DiGraph.DiGraphNode<Point2D, GeofabrikData> targetNode = graphHolder.findNearestPoint(target);
+
+        BDV<Point2D, GeofabrikData> dj = new BDV<Point2D, GeofabrikData>(graphHolder.getRoadGraph());
+        double length = dj.run(sourceNode,targetNode);
+//        System.out.println(length);
+        List<DiGraph.DiGraphNode<Point2D, GeofabrikData>> path = dj.getExploredNodes(targetNode);
+
+        List<Coordinate> returnList_nodes = new ArrayList<Coordinate>();
+
+        returnList_nodes.add(new Coordinate(lat1,lon1));
+        for(DiGraph.DiGraphNode<Point2D, GeofabrikData> p : path){
+        	if (p != null) {
+                returnList_nodes.add(EN2LatLon(p.getNodeData().getX(), p.getNodeData().getY()));
+        	}
+        }
+        returnList_nodes.add(new Coordinate(lat2,lon2));
+        
+        return returnList_nodes;
+    }
+    
+    
+    public static List<Coordinate>  getShortestPathBiDiITRT(double lat1,double lon1,double lat2, double lon2) throws Exception {
+
+        /** Transform lat-lon to East-North */
+            // You should use LatLon2EN to transform it.
+        Coordinate source = LatLon2EN(lat1, lon1);
+        Coordinate target = LatLon2EN(lat2, lon2);
+
+        /** Get Graph Holder from Road Graph Holder */
+            // Hint : RoadGraphHolder.getInstance() returns graph holder
+        RoadGraphHolder graphHolder = RoadGraphHolder.getInstance();
+        /** Find The Nearest nodes in the graph */
+            // Hint : RoadGraphHolder has function to find nearest Node 'findNearestPoint(Coordinate p)'
+        DiGraph.DiGraphNode<Point2D, GeofabrikData> sourceNode = graphHolder.findNearestPoint(source);
+        DiGraph.DiGraphNode<Point2D, GeofabrikData> targetNode = graphHolder.findNearestPoint(target);
+
+        /** Create Dijkstra shortest path class with your graph and run*/
+            // Dijkstra class path is Base/routing/Dijkstra, check the construction parameters
+            // and find how to run Dijkstra
+
+        BiDijkstraITRT<Point2D, GeofabrikData> dj = new BiDijkstraITRT<Point2D, GeofabrikData>(graphHolder.getRoadGraph());
+        
+        dj.run(sourceNode,targetNode);
+//        dj.run(targetNode,sourceNode);
+        List<DiGraph.DiGraphNode<Point2D, GeofabrikData>> path = dj.getPath();
+        List<Coordinate> returnList = new ArrayList<>();
+        returnList.add(new Coordinate(lat1,lon1));
+        /** get shortest path  and convert to coordinate List (List<Coordinate>)  As Latitude Longitude*/
+        //
+        for(DiGraph.DiGraphNode<Point2D, GeofabrikData> p : path){
+            returnList.add(EN2LatLon(p.getNodeData().getX(),p.getNodeData().getY()));
+        }
+        returnList.add(new Coordinate(lat2,lon2));
+        /** return shortest path */
+        return returnList;
+    }
+    
+
+    public static List<Coordinate>  getExploredNodesBiDiITRT(double lat1,double lon1,double lat2, double lon2) throws Exception {
+
+        Coordinate source = LatLon2EN(lat1, lon1);
+        Coordinate target = LatLon2EN(lat2, lon2);
+
+        RoadGraphHolder graphHolder = RoadGraphHolder.getInstance();
+
+        DiGraph.DiGraphNode<Point2D, GeofabrikData> sourceNode = graphHolder.findNearestPoint(source);
+        DiGraph.DiGraphNode<Point2D, GeofabrikData> targetNode = graphHolder.findNearestPoint(target);
+
+        BiDijkstraITRT<Point2D, GeofabrikData> dj = new BiDijkstraITRT<Point2D, GeofabrikData>(graphHolder.getRoadGraph());
         double length = dj.run(sourceNode,targetNode);
 //        System.out.println(length);
         List<DiGraph.DiGraphNode<Point2D, GeofabrikData>> path = dj.getExploredNodes(targetNode);

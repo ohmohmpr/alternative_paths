@@ -4,15 +4,17 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import com.lbs.lbs.Base.graph.DiGraph;
 import com.lbs.lbs.Base.graph.DiGraph.DiGraphArc;
 import com.lbs.lbs.Base.graph.DiGraph.DiGraphNode;
+import com.lbs.lbs.Base.graph.types.AlternativePaths;
 import com.lbs.lbs.Base.graph.types.WeightedArcData;
 import com.lbs.lbs.Base.util.MinHeap;
 import com.lbs.lbs.Base.util.MinHeap.HeapItem;
 
-public class BiDijkstra<V, E extends WeightedArcData> {
+public class BDV<V, E extends WeightedArcData> {
 
 
 	private double starttime = 0;
@@ -28,13 +30,21 @@ public class BiDijkstra<V, E extends WeightedArcData> {
 	protected HeapItem<DiGraphNode<V, E>> items_B[];
 	public DiGraphNode<V, E> pred_B[];
 
+	// BD
 	protected double shortestPathLength = Double.MAX_VALUE;
 	protected int currentStamp = 0;
 	protected int counter_delete = 0;
 	public int commonNodeID;
+	public int commonNodeIDcounter = 0;
+	
+	// BD variables
+	protected double optimalShortestPath = Double.MAX_VALUE;
+	protected double epsilon = 0.25; // stretch longest admissible path can be.
+	protected int p = 3; // number of alternative paths.
+	public ArrayList<AlternativePaths<V, E>> alternativePaths;
 	
 	@SuppressWarnings("unchecked")
-	public BiDijkstra(DiGraph<V, E> g) {
+	public BDV(DiGraph<V, E> g) {
 		this.dist_F = new double[g.n()];
 		this.stamps_F = new int[g.n()];
 		this.items_F = new HeapItem[g.n()];
@@ -44,6 +54,8 @@ public class BiDijkstra<V, E extends WeightedArcData> {
 		this.stamps_B = new int[g.n()];
 		this.items_B = new HeapItem[g.n()];
 		this.pred_B = new DiGraphNode[g.n()];
+		
+		this.alternativePaths = new ArrayList<AlternativePaths<V,E>>();
 	}
 	
 
@@ -140,8 +152,20 @@ public class BiDijkstra<V, E extends WeightedArcData> {
 			DiGraphNode<V, E> u_B = item_B.getValue();
 			curr_dist_B = dist_B[u_B.getId()];
 
-			if ((curr_dist_F + curr_dist_B) >= shortestPathLength) {
-				System.out.println("shortestPathLength " + shortestPathLength);
+			
+			if ((curr_dist_F + curr_dist_B) >= shortestPathLength && optimalShortestPath == Double.MAX_VALUE) {
+				optimalShortestPath = shortestPathLength;
+				System.out.println("optimalShortestPath " + optimalShortestPath);
+			}
+			
+			
+			if (shortestPathLength > (1 + epsilon) * optimalShortestPath) {
+				//ALSO have to find the optimal path and compare with it.
+				
+				// terminate conditions = must be only stretch because we will order them by cost function
+				// from this returns p alternative ranking from cost functions.
+				// need a class to represent altervative paths.
+				System.out.println("commonNodeIDcounter " + commonNodeIDcounter);
 				break;
 			}
 			
@@ -155,15 +179,19 @@ public class BiDijkstra<V, E extends WeightedArcData> {
 					
 					if (items_B[v.getId()] != null) {
 						commonNodeID = v.getId();
+						commonNodeIDcounter = commonNodeIDcounter + 1;
+						shortestPathLength = dist_F[u_F.getId()] + dist_B[u_B.getId()];
+						List<DiGraphNode<V, E>> path_for_add = getPath();
+						AlternativePaths<V, E> alternativePath = new AlternativePaths<>(commonNodeID, shortestPathLength, path_for_add);
+						alternativePaths.add(alternativePath);
+
+//						System.out.println("sizesizesizesizesizesizesizesize");
+//						System.out.println(alternativePaths.size());
+						
 						System.out.println("Foreward");
 						System.out.println("commonNodeID " + commonNodeID);
-						
-//						System.out.println("items_F[v.getId()] = " + items_F[v.getId()]);
-//						System.out.println("items_B[v.getId()] = " + items_B[v.getId()]);
-//						System.out.println("dist_F[u_F.getId()] = " + dist_F[u_F.getId()]);
-//						System.out.println("dist_B[u_B.getId()] = " + dist_B[u_B.getId()]);
-						
-						shortestPathLength = dist_F[u_F.getId()] + dist_B[u_B.getId()];
+						System.out.println("shortestPathLength " + shortestPathLength);
+
 					}
 				}
 			} else {
@@ -176,28 +204,24 @@ public class BiDijkstra<V, E extends WeightedArcData> {
 
 	 				if (items_F[v.getId()] != null) {
 						commonNodeID = v.getId();
+						commonNodeIDcounter = commonNodeIDcounter + 1;
+						shortestPathLength = dist_F[u_F.getId()] + dist_B[u_B.getId()];
+
+						List<DiGraphNode<V, E>> path_for_add = getPath();
+						AlternativePaths<V, E> alternativePath = new AlternativePaths<>(commonNodeID, shortestPathLength, path_for_add);
+						alternativePaths.add(alternativePath);
+
+//						System.out.println("sizesizesizesizesizesizesizesize");
+//						System.out.println(alternativePaths.size());
+						
 						System.out.println("Backward");
 						System.out.println("commonNodeID " + commonNodeID);
-//						System.out.println("items_F[v.getId()] = " + items_F[v.getId()]);
-//						System.out.println("items_B[v.getId()] = " + items_B[v.getId()]);
-//						System.out.println("dist_F[u_F.getId()] = " + dist_F[u_F.getId()]);
-//						System.out.println("dist_B[u_B.getId()] = " + dist_B[u_B.getId()]);
-						
-						shortestPathLength = dist_F[u_F.getId()] + dist_B[u_B.getId()];
+						System.out.println("shortestPathLength " + shortestPathLength);
+
 					}
 				}
 			}
-//
-//			System.out.println("curr_dist_F");
-//			System.out.println(curr_dist_F);
-//			System.out.println("curr_dist_B");
-//			System.out.println(curr_dist_B);
-//
-//			if (!visitor.visit(u_F)) {
-//				return false;
-//			}
-//
-//			break;
+
 		}
 		System.out.println("counter_delete = " + counter_delete);
 		return true;
@@ -257,6 +281,10 @@ public class BiDijkstra<V, E extends WeightedArcData> {
 		}
 
 		return new ArrayList<DiGraphNode<V, E>>(path);
+	}
+
+	public ArrayList<AlternativePaths<V, E>>  getPaths() {
+		return alternativePaths;
 	}
 	
 	public List<DiGraphNode<V, E>> getExploredNodes(DiGraphNode<V, E> target) {

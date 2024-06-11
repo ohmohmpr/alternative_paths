@@ -147,9 +147,13 @@ map.on("click", function (e) {
 
 
 
-  
-      const url = `${server}/${groupName}/ex1/${routeMethod}bidi?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
-      const url_explorednodes = `${server}/${groupName}/ex1/explorednodesbidi?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
+  	// get shortest
+//      const url = `${server}/${groupName}/ex1/${routeMethod}bdv?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
+//      const url_explorednodes = `${server}/${groupName}/ex1/explorednodesbdv?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
+
+  	// get alternatives
+      const url = `${server}/${groupName}/ex1/alternativebdv?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
+      const url_explorednodes = `${server}/${groupName}/ex1/explorednodesbdv?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
 
     fetch(url)
             .then(response => {
@@ -161,39 +165,43 @@ map.on("click", function (e) {
             })
             .then(data => {
                 if (routeMethod != "multimodalroute") {
-                    drawPath(data);
+                    drawPath(data[0]);
+                    drawPath(data[1]);
+                    drawPath(data[2]);
+                    console.log(data);
                 } else {
                     drawMultiModalPath(data)
                 }
 
             })
             .catch(error => {
+				console.log(error);
             });
             
            
-    fetch(url_explorednodes)
-            .then(response => {
-              if (response.ok) {
-                return response.json();
-              } else {
-                throw new Error('Connection is unsuccessful.');
-              }
-            })
-            .then(data => {
-                if (routeMethod != "multimodalroute") {
-                    drawExploredNodes(data);
-                } else {
-                    drawMultiModalPath(data)
-                }
-            })
-            .catch(error => {
-				console.log(error)
-            });
+//    fetch(url_explorednodes)
+//            .then(response => {
+//              if (response.ok) {
+//                return response.json();
+//              } else {
+//                throw new Error('Connection is unsuccessful.');
+//              }
+//            })
+//            .then(data => {
+//                if (routeMethod != "multimodalroute") {
+//                    drawExploredNodes(data);
+//                } else {
+//                    drawMultiModalPath(data)
+//                }
+//            })
+//            .catch(error => {
+//				console.log(error)
+//            });
   }
   function drawPath(path) {
-    if (line) {
-      map.removeLayer(line);
-    }
+//    if (line) {
+//      map.removeLayer(line);
+//    }
     if (oldLineList.length>0){
         oldLineList.forEach(item => map.removeLayer(item));
         oldLineList = [];
