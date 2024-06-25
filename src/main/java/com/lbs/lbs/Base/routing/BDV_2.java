@@ -18,7 +18,7 @@ import java.util.List;
  * initialized. Due to some internal time stamp mechanism, the class supports
  * multiple executions without the need to reinitialize the data structures.
  */
-public class BidirectionalDijkstra<V, E extends WeightedArcData> {
+public class BDV_2<V, E extends WeightedArcData> {
 
 	private double starttime = 0;
 	private DiGraphNode<V, E> via_node = null;
@@ -32,9 +32,11 @@ public class BidirectionalDijkstra<V, E extends WeightedArcData> {
 	public DiGraphNode<V, E> pred_B[];
 
 	protected int currentStamp = 0;
+	
+	protected double epsilon = 0.25; // stretch longest admissible path can be.
 
 	@SuppressWarnings("unchecked")
-	public BidirectionalDijkstra(DiGraph<V, E> g) {
+	public BDV_2(DiGraph<V, E> g) {
 		this.dist_F = new double[g.n()];
 		this.dist_B = new double[g.n()];
 		this.stamps_F = new int[g.n()];
@@ -45,7 +47,7 @@ public class BidirectionalDijkstra<V, E extends WeightedArcData> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public BidirectionalDijkstra(DiGraph<V, E> g, double startTime) {
+	public BDV_2(DiGraph<V, E> g, double startTime) {
 		this.dist_F = new double[g.n()];
 		this.dist_B = new double[g.n()];
 		this.stamps_F = new int[g.n()];
@@ -116,6 +118,9 @@ public class BidirectionalDijkstra<V, E extends WeightedArcData> {
 		DiGraphNode<V, E> top_t = target;
 		
 		while (queue_F.size() > 0 && queue_B.size() > 0) {
+			
+			
+			
 			if (dist_F[top_s.getId()] + dist_B[top_t.getId()] < mu) {
 				System.out.println("found optimalShortestPath " );
 				break;

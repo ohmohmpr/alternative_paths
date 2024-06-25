@@ -153,7 +153,7 @@ public class BiDijkstra<V, E extends WeightedArcData> {
 					weightOfArc = nit.getWeightOfCurrentArc(u_F, v);
 					discoverNode_F(u_F, v, queue_F, dist_F[u_F.getId()] + weightOfArc);
 					
-					if (items_B[v.getId()] != null) {
+					if (items_B[v.getId()] != null && shortestPathLength > dist_F[u_F.getId()] + dist_B[u_B.getId()]) {
 						commonNodeID = v.getId();
 						System.out.println("Foreward");
 						System.out.println("commonNodeID " + commonNodeID);
@@ -174,7 +174,7 @@ public class BiDijkstra<V, E extends WeightedArcData> {
 					weightOfArc = nit.getWeightOfCurrentArc(u_B, v);
 					discoverNode_B(u_B, v, queue_B, dist_B[u_B.getId()] + weightOfArc);
 
-	 				if (items_F[v.getId()] != null) {
+	 				if (items_F[v.getId()] != null && shortestPathLength > dist_F[u_F.getId()] + dist_B[u_B.getId()]) {
 						commonNodeID = v.getId();
 						System.out.println("Backward");
 						System.out.println("commonNodeID " + commonNodeID);

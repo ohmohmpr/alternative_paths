@@ -18,7 +18,7 @@ const targetImgRes = fetch("https://cdn4.iconfinder.com/data/icons/small-n-flat/
  var miny = leftBottom[1];
  var maxx = rightTop[0];
  var maxy = rightTop[1];
-var oldLineList = [];
+//var oldLineList = [];
  let routeMethod = "shortestpath";
 
  tile_layer = new ol.layer.Tile({ source: new ol.source.OSM() });
@@ -100,40 +100,42 @@ const marker2Icon =
     }),
   });
 marker2.setStyle(marker2Icon);
+
 map.on("click", function (e) {
-      if (line) {
-          map.removeLayer(line);
-      }
-      if (oldLineList.length>0){
-          oldLineList.forEach(item => map.removeLayer(item));
-          oldLineList = [];
-      }
-      var position = ol.proj.toLonLat(e.coordinate);
-
-      if (counter%2 === 0) {
-        map.removeLayer(markerLayer2)
-        marker1.getGeometry().setCoordinates(e.coordinate);
-        markerLayer1 = new ol.layer.Vector({
-          source: new ol.source.Vector({
-            features: [marker1]
-          })
-        });
-
-        map.addLayer(markerLayer1);
-        coord1Input.value = position[0].toFixed(7) + "," + position[1].toFixed(7);
-        counter++;
-      } else if (counter%2 === 1) {
-        marker2.getGeometry().setCoordinates(e.coordinate);
-          markerLayer2 = new ol.layer.Vector({
-          source: new ol.source.Vector({
-            features: [marker2]
-          })
-        });
-        map.addLayer(markerLayer2);
-        coord2Input.value = position[0].toFixed(7) + "," + position[1].toFixed(7);
-        counter++;
-      }
-    });
+	  if (line) {
+	      map.removeLayer(line);
+	  }
+//	  if (oldLineList.length>0){
+//	      oldLineList.forEach(item => map.removeLayer(item));
+//	      oldLineList = [];
+//	  }
+	  var position = ol.proj.toLonLat(e.coordinate);
+	
+	  if (counter%2 === 0) {
+	    map.removeLayer(markerLayer2)
+	    marker1.getGeometry().setCoordinates(e.coordinate);
+	    markerLayer1 = new ol.layer.Vector({
+	      source: new ol.source.Vector({
+	        features: [marker1]
+	      })
+	    });
+	
+	    map.addLayer(markerLayer1);
+	    coord1Input.value = position[0].toFixed(7) + "," + position[1].toFixed(7);
+	    counter++;
+	  } else if (counter%2 === 1) {
+	    marker2.getGeometry().setCoordinates(e.coordinate);
+	      markerLayer2 = new ol.layer.Vector({
+	      source: new ol.source.Vector({
+	        features: [marker2]
+	      })
+	    });
+	    map.addLayer(markerLayer2);
+	    coord2Input.value = position[0].toFixed(7) + "," + position[1].toFixed(7);
+	    counter++;
+	  }
+	}
+);
 
   function findShortestPath() {
 
@@ -145,13 +147,15 @@ map.on("click", function (e) {
     var lon2 = parseFloat(coord2[0]);
 
 
+
+
   	// get shortest
-      const url = `${server}/${groupName}/ex1/${routeMethod}bdv?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
-      const url_explorednodes = `${server}/${groupName}/ex1/explorednodesbdv?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
+//      const url = `${server}/${groupName}/ex1/${routeMethod}bidi?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
+//      const url_explorednodes = `${server}/${groupName}/ex1/explorednodesbidi?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
 
   	// get alternatives
- //     const url = `${server}/${groupName}/ex1/alternativebdv?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
-  //    const url_explorednodes = `${server}/${groupName}/ex1/explorednodesbdv?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
+      const url = `${server}/${groupName}/ex1/alternativebdv?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
+//      const url_explorednodes = `${server}/${groupName}/ex1/explorednodesbdv?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
 
     fetch(url)
             .then(response => {
@@ -163,9 +167,9 @@ map.on("click", function (e) {
             })
             .then(data => {
                 if (routeMethod != "multimodalroute") {
-                    drawPath(data[0]);
-                    drawPath(data[1]);
-                    drawPath(data[2]);
+                    drawPath(data[0],'#0080ff');
+                    drawPath(data[1],"#FF0000");
+                    drawPath(data[2],"#008000");
                     console.log(data);
                 } else {
                     drawMultiModalPath(data)
@@ -196,14 +200,20 @@ map.on("click", function (e) {
 //				console.log(error)
 //            });
   }
-  function drawPath(path) {
+  
+  
+  
+  
+  
+  
+  function drawPath(path,colorCode) {
 //    if (line) {
 //      map.removeLayer(line);
 //    }
-    if (oldLineList.length>0){
-        oldLineList.forEach(item => map.removeLayer(item));
-        oldLineList = [];
-    }
+//    if (oldLineList.length>0) {
+//        oldLineList.forEach(item => map.removeLayer(item));
+//        oldLineList = [];
+//    }
     var points = [];
     for (var i = 0; i < path.length; i++) {
       var coord = path[i];
@@ -219,7 +229,7 @@ map.on("click", function (e) {
 
     var lineStyle = new ol.style.Style({
       stroke: new ol.style.Stroke({
-        color: '#0080ff',
+        color: colorCode,
         width: 4,
         opacity: 1,
         lineDash: [.1, 7]
@@ -236,11 +246,13 @@ map.on("click", function (e) {
     });
     map.addLayer(line);
   }
+
+
 let ptCount =0;
 function drawMultiModalPath(path) {
     // Önceki katmanları temizle
-    oldLineList.forEach(item => map.removeLayer(item));
-    oldLineList = [];
+//    oldLineList.forEach(item => map.removeLayer(item));
+//    oldLineList = [];
     if (line) {
         map.removeLayer(line);
     }
@@ -277,7 +289,7 @@ function drawMultiModalPath(path) {
             });
             pointLayer.setStyle(pth.condition == "departure" ? departurePointStyle : arrivalPointStyle);
             map.addLayer(pointLayer);
-            oldLineList.push(pointLayer);
+//            oldLineList.push(pointLayer);
         }
 
         points.push(point);
@@ -303,7 +315,7 @@ function drawMultiModalPath(path) {
             source: vectorSource
         });
         map.addLayer(line);
-        oldLineList.push(line);
+//        oldLineList.push(line);
     }
 }
 
@@ -311,10 +323,10 @@ function drawMultiModalPath(path) {
     if (exploredNodes) {
       map.removeLayer(exploredNodes);
     }
-    if (oldLineList.length>0){
-        oldLineList.forEach(item => map.removeLayer(item));
-        oldLineList = [];
-    }
+//    if (oldLineList.length>0){
+//        oldLineList.forEach(item => map.removeLayer(item));
+//        oldLineList = [];
+//    }
     var points = [];
     for (var i = 0; i < path.length; i++) {
       var coord = path[i];
@@ -362,5 +374,21 @@ function drawMultiModalPath(path) {
 
  } );
 
+async function fetchData() {
+  try {
+    // Show the overlay
+    document.getElementById('overlay').style.display = 'flex';
+
+    // Simulate a network request with a delay
+    const response = await new Promise((resolve) => setTimeout(() => resolve('Data fetched'), 10000));
+
+    console.log(response);
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  } finally {
+    // Hide the overlay
+    document.getElementById('overlay').style.display = 'none';
+  }
+}
 
 

@@ -102,7 +102,22 @@
 			display: flex;
     		flex-direction: column;
 		}
-
+		
+	    /* Overlay styling */
+	    #overlay {
+	      position: fixed;
+	      top: 0;
+	      left: 0;
+	      width: 100%;
+	      height: 100%;
+	      background: rgba(0, 0, 0, 0.5);
+	      z-index: 1000;
+	      display: none;
+	      justify-content: center;
+	      align-items: center;
+	      color: white;
+	      font-size: 2em;
+	    }
 		
 
 	</style>
@@ -116,7 +131,8 @@
 </head>
 
 <body>
-	<div class="wrapper">
+<!-- 	<div id="overlay" >Loading...</div> -->
+	<div  class="wrapper">
 		<div class="box boxLeft">
 			<b style="font-family: Arial">
 				LBS Exercise -
@@ -156,6 +172,7 @@
 					<input type="text" id="coord2">
 					<br>
 					<button type="button" onclick="findShortestPath()">Find Path</button>
+<!-- 					<button onclick="fetchData()">Fetch Data</button> -->
 				</form>
 			</div>
 		</div>
