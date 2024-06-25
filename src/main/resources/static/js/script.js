@@ -426,12 +426,13 @@ const clearOldLayers = () => {
 /************* --------------------- *************/
 
 /**** CONSTANTS ******/
-const GROUP_NAME = "lbsproject-ohm-prod";
+const GROUP_NAME = "lbsproject-ohm";
 const BASE_URL = "http://localhost:8080";
 // const BASE_URL = "https://geonet.igg.uni-bonn.de";
 const LEFT_BOTTOM = ol.proj.transform([7.004813999686911, 50.67771640948173], "EPSG:4326", "EPSG:3857");
 const RIGHT_TOP = ol.proj.transform([7.19776199427912, 50.768218129933224], "EPSG:4326", "EPSG:3857");
 /**** -------- *****/
+
 
 
 /**** MIN_MAX_COORDS *****/
