@@ -177,14 +177,18 @@ public class BDV<V, E extends WeightedArcData> {
 					weightOfArc = nit.getWeightOfCurrentArc(u_F, v);
 					discoverNode_F(u_F, v, queue_F, dist_F[u_F.getId()] + weightOfArc);
 					
+					// find the common node in backward direction;
 					if (items_B[v.getId()] != null) {
 						commonNodeID = v.getId();
 						commonNodeIDcounter = commonNodeIDcounter + 1;
 						shortestPathLength = dist_F[u_F.getId()] + dist_B[u_B.getId()];
 						List<DiGraphNode<V, E>> path_for_add = getPath();
 						AlternativePaths<V, E> alternativePath = new AlternativePaths<>(commonNodeID, shortestPathLength, path_for_add);
+						
 						alternativePaths.add(alternativePath);
-
+						
+						AlternativePaths<V, E> OptimaPath = 	alternativePath;
+						
 //						System.out.println("sizesizesizesizesizesizesizesize");
 //						System.out.println(alternativePaths.size());
 						
@@ -284,6 +288,14 @@ public class BDV<V, E extends WeightedArcData> {
 	}
 
 	public ArrayList<AlternativePaths<V, E>>  getPaths() {
+		
+		for (AlternativePaths<V, E> path : alternativePaths) {
+			  System.out.println("dist");
+			  System.out.println(path.dist);
+			  System.out.println("path.path");
+			  System.out.println(path.path);
+			}
+		
 		return alternativePaths;
 	}
 	
