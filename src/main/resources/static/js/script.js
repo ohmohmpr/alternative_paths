@@ -481,7 +481,9 @@ const secondCoordInput = document.getElementById("coord2");
 
 
 /****** LAYERS ******/
-const TILE_LAYER = new ol.layer.Tile({ source: new ol.source.OSM()});
+// BUG:: if put const here code doesn't work;
+TILE_LAYER = new ol.layer.Tile({ source: new ol.source.OSM()});
+//const TILE_LAYER = new ol.layer.Tile({ source: new ol.source.OSM()});
 /**** -------- *****/
 
 
@@ -502,7 +504,7 @@ const MAP = new ol.Map({
 /**** -------- *****/
 
 /***** PRESET STYLE *****/
-const WALK_LINE_STYLE = new ol.style.Style({
+var WALK_LINE_STYLE = new ol.style.Style({
     stroke: new ol.style.Stroke({
         color: '#0080ff',
         width: 4,
@@ -523,9 +525,29 @@ let ptCount = 0;
 
 
 
-function drawPath(path) {
+function drawPath(path, colorCode="") {
 
-    clearOldLayers();
+	if (!colorCode == "") {
+		WALK_LINE_STYLE = new ol.style.Style({
+		    stroke: new ol.style.Stroke({
+		        color: colorCode,
+		        width: 4,
+		        opacity: 1,
+		        lineDash: [.1, 7]
+		    })
+		});
+	} else {
+		clearOldLayers();
+		WALK_LINE_STYLE = new ol.style.Style({
+		    stroke: new ol.style.Stroke({
+		        color: '#0080ff',
+		        width: 4,
+		        opacity: 1,
+		        lineDash: [.1, 7]
+		    })
+		});
+	}
+    	
     const points = [];
 
     for (let i = 0; i < path.length; i++) {
@@ -542,9 +564,7 @@ function drawPath(path) {
 
     lineFeature.setStyle(WALK_LINE_STYLE);
     line = createLayerVector([lineFeature]);
-    console.log(line);
     addLayer(line);
-    
 }
 
 
@@ -642,21 +662,19 @@ async function findShortestPath() {
 
     let url = `${BASE_URL}/${GROUP_NAME}/ex1/${pathMethod === "singlepath" ? routeMethod : 'alternativebdv'}?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
     const res = await fetch(url);
-//    document.getElementById("overlay").style.display = "flex";
     const data = await res.json();
-    
-  	console.log(data);
 
     if (routeMethod !== "multimodalroute" && pathMethod === "singlepath") {
         drawPath(data);
-        console.log("Debug here")
-//        document.getElementById("overlay").style.display = "none";
     } else if (routeMethod === "multimodalroute" && pathMethod === "singlepath") {
         clearOldLayers();
         drawMultiModalPath(data)
     } else if (routeMethod !== "multimodalroute" && pathMethod === "alternativepath") {
         clearOldLayers();
-        data.forEach(pathData => drawMultiModalPath(pathData, true));
+		drawPath(data[0],"#0080ff");
+		drawPath(data[1],"#FF0000");
+		drawPath(data[2],"#008000");
+//        data.forEach(pathData => drawMultiModalPath(pathData, true));
     }else{
         clearOldLayers();
         data.forEach(pathData => drawMultiModalPath(pathData, true));
