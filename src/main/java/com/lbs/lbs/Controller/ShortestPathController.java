@@ -73,14 +73,12 @@ public class ShortestPathController {
         /**
          * This Function's inputs are latitude and longitude, represents source and target locations
          * returns list of the shortest path coordinates as latitude and longitude*/
-
         try {
             List<Coordinate> path = ShortestPathService.getShortestPathBiDi(lat1, lon1, lat2, lon2);
             return new ResponseEntity(path, HttpStatus.OK);
         } catch (Exception e){
             return new ResponseEntity(e.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
         }
-
     }
     
 

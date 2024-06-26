@@ -101,32 +101,20 @@ public class ShortestPathService {
 
     public static List<Coordinate>  getShortestPathBiDi(double lat1,double lon1,double lat2, double lon2) throws Exception {
 
-        /** Transform lat-lon to East-North */
-            // You should use LatLon2EN to transform it.
         Coordinate source = LatLon2EN(lat1, lon1);
         Coordinate target = LatLon2EN(lat2, lon2);
 
-        /** Get Graph Holder from Road Graph Holder */
-            // Hint : RoadGraphHolder.getInstance() returns graph holder
         RoadGraphHolder graphHolder = RoadGraphHolder.getInstance();
-        /** Find The Nearest nodes in the graph */
-            // Hint : RoadGraphHolder has function to find nearest Node 'findNearestPoint(Coordinate p)'
         DiGraph.DiGraphNode<Point2D, GeofabrikData> sourceNode = graphHolder.findNearestPoint(source);
         DiGraph.DiGraphNode<Point2D, GeofabrikData> targetNode = graphHolder.findNearestPoint(target);
 
-        /** Create Dijkstra shortest path class with your graph and run*/
-            // Dijkstra class path is Base/routing/Dijkstra, check the construction parameters
-            // and find how to run Dijkstra
-
         BiDijkstra<Point2D, GeofabrikData> dj = new BiDijkstra<Point2D, GeofabrikData>(graphHolder.getRoadGraph());
-        
         dj.run(sourceNode,targetNode);
-//        dj.run(targetNode,sourceNode);
+
         List<DiGraph.DiGraphNode<Point2D, GeofabrikData>> path = dj.getPath();
         List<Coordinate> returnList = new ArrayList<>();
+        
         returnList.add(new Coordinate(lat1,lon1));
-        /** get shortest path  and convert to coordinate List (List<Coordinate>)  As Latitude Longitude*/
-        //
         for(DiGraph.DiGraphNode<Point2D, GeofabrikData> p : path){
             returnList.add(EN2LatLon(p.getNodeData().getX(),p.getNodeData().getY()));
         }
