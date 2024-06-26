@@ -139,34 +139,6 @@ public class ShortestPathController {
         }
     }
 
-    @GetMapping("/shortestpathbidiitrt")
-    public ResponseEntity<List<Coordinate>> simpleShortestPathBiDiITRTController(@RequestParam double lat1,@RequestParam double lon1,@RequestParam double lat2,@RequestParam double lon2){
-        /**
-         * This Function's inputs are latitude and longitude, represents source and target locations
-         * returns list of the shortest path coordinates as latitude and longitude*/
-
-        try {
-            List<Coordinate> path = ShortestPathService.getShortestPathBiDiITRT(lat1, lon1, lat2, lon2);
-            return new ResponseEntity(path, HttpStatus.OK);
-        } catch (Exception e){
-            return new ResponseEntity(e.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
-        }
-
-    }
-    
-
-    @GetMapping("/explorednodesbidiitrt")
-    public ResponseEntity<List<Coordinate>> getExploredNodesBiDiITRT(@RequestParam double lat1,@RequestParam double lon1,@RequestParam double lat2,@RequestParam double lon2){
-        try {
-            List<Coordinate> path = ShortestPathService.getExploredNodesBiDiITRT(lat1, lon1, lat2, lon2);
-        	System.out.println(HttpStatus.OK);
-            return new ResponseEntity(path, HttpStatus.OK);
-        } catch (Exception e){
-        	System.out.println(e);
-            return new ResponseEntity(e.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
-        }
-    }
-
     @GetMapping("/multimodalroute")
     public ResponseEntity<List<Coordinate>> multiModalRouteController(@RequestParam double lat1,
                                                                       @RequestParam double lon1,

@@ -1,27 +1,7 @@
-//var map;
-// var coord1Input = document.getElementById("coord1");
-// var coord2Input = document.getElementById("coord2");
-// var marker1;
-// var marker2;
 // var line;
 // var exploredNodes;
-// var groupName = "lbsproject-ohm"
 // let counter = 0;
-//// var server = "https://geonet.igg.uni-bonn.de";
-// var server = "http://localhost:8080";
-// var markerLayer1;
-// var markerLayer2;
-//const targetImgRes = fetch("https://cdn4.iconfinder.com/data/icons/small-n-flat/24/map-marker-1024.png");
-// var leftBottom =  ol.proj.transform([7.004813999686911, 50.67771640948173], "EPSG:4326", "EPSG:3857");
-// var rightTop = ol.proj.transform([7.19776199427912, 50.768218129933224], "EPSG:4326", "EPSG:3857");
-// var minx = leftBottom[0];
-// var miny = leftBottom[1];
-// var maxx = rightTop[0];
-// var maxy = rightTop[1];
-////var oldLineList = [];
-// let routeMethod = "shortestpath";
 //
-// tile_layer = new ol.layer.Tile({ source: new ol.source.OSM() });
 // var oldZoom = 2;
 // var walkLineStyle = new ol.style.Style({
 //     stroke: new ol.style.Stroke({
@@ -59,198 +39,6 @@
 //        opacity: 1
 //    })
 //});
-//
-// var map = new ol.Map({
-//	target: 'map',
-//	layers: [
-//		tile_layer
-//	],
-//	view: new ol.View({
-//		center: ol.proj.fromLonLat([(minx+maxx)/2, (maxy+miny)/2]),
-//		zoom: oldZoom,
-//		maxZoom: 20,
-//		minZoom: 2,
-//		extent: [minx, miny, maxx, maxy],
-//	})
-//});
-//marker1 = new ol.Feature({
-//  geometry: new ol.geom.Point(1,1)
-//});
-//
-//const marker1Icon =
-//  new ol.style.Style({
-//    image: new ol.style.Icon({
-//      crossOrigin: 'anonymous',
-//      src: 'https://cdn1.iconfinder.com/data/icons/web-55/32/web_1-1024.png',
-//      scale: "0.03"
-//    }),
-//});
-//
-//marker1.setStyle(marker1Icon);
-//
-//marker2 = new ol.Feature({
-//  geometry: new ol.geom.Point(1,1)
-//});
-//const marker2Icon = 
-//  new ol.style.Style({
-//    image: new ol.style.Icon({
-//      crossOrigin: 'anonymous',
-//      src: 'https://cdn4.iconfinder.com/data/icons/twitter-29/512/157_Twitter_Location_Map-1024.png',
-//      scale: "0.04"
-//    }),
-//  });
-//marker2.setStyle(marker2Icon);
-//
-//map.on("click", function (e) {
-//	  if (line) {
-//	      map.removeLayer(line);
-//	  }
-////	  if (oldLineList.length>0){
-////	      oldLineList.forEach(item => map.removeLayer(item));
-////	      oldLineList = [];
-////	  }
-//	  var position = ol.proj.toLonLat(e.coordinate);
-//	
-//	  if (counter%2 === 0) {
-//	    map.removeLayer(markerLayer2)
-//	    marker1.getGeometry().setCoordinates(e.coordinate);
-//	    markerLayer1 = new ol.layer.Vector({
-//	      source: new ol.source.Vector({
-//	        features: [marker1]
-//	      })
-//	    });
-//	
-//	    map.addLayer(markerLayer1);
-//	    coord1Input.value = position[0].toFixed(7) + "," + position[1].toFixed(7);
-//	    counter++;
-//	  } else if (counter%2 === 1) {
-//	    marker2.getGeometry().setCoordinates(e.coordinate);
-//	      markerLayer2 = new ol.layer.Vector({
-//	      source: new ol.source.Vector({
-//	        features: [marker2]
-//	      })
-//	    });
-//	    map.addLayer(markerLayer2);
-//	    coord2Input.value = position[0].toFixed(7) + "," + position[1].toFixed(7);
-//	    counter++;
-//	  }
-//	}
-//);
-//
-//  function findShortestPath() {
-//
-//    var coord1 = coord1Input.value.split(",");
-//    var coord2 = coord2Input.value.split(",");
-//    var lat1 = parseFloat(coord1[1]);
-//    var lon1 = parseFloat(coord1[0]);
-//    var lat2 = parseFloat(coord2[1]);
-//    var lon2 = parseFloat(coord2[0]);
-//
-//
-//
-//
-//  	// get shortest
-////      const url = `${server}/${groupName}/ex1/${routeMethod}bidi?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
-////      const url_explorednodes = `${server}/${groupName}/ex1/explorednodesbidi?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
-//
-//  	// get alternatives
-//      const url = `${server}/${groupName}/ex1/alternativebdv?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
-////      const url_explorednodes = `${server}/${groupName}/ex1/explorednodesbdv?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
-//
-//	document.getElementById("overlay").style.display = "flex";
-//
-//    fetch(url)
-//            .then(response => {
-//              if (response.ok) {
-//                return response.json();
-//              } else {
-//                throw new Error('Connection is unsuccessful.');
-//              }
-//            })
-//            .then(data => {
-//                if (routeMethod != "multimodalroute") {
-//                    drawPath(data[0],'#0080ff');
-//                    drawPath(data[1],"#FF0000");
-//                    drawPath(data[2],"#008000");
-//                    console.log(data);
-//				  document.getElementById("overlay").style.display = "none";
-//                } else {
-//                    drawMultiModalPath(data)
-//                }
-//
-//            })
-//            .catch(error => {
-//				console.log(error);
-//            });
-//            
-//           
-////    fetch(url_explorednodes)
-////            .then(response => {
-////              if (response.ok) {
-////                return response.json();
-////              } else {
-////                throw new Error('Connection is unsuccessful.');
-////              }
-////            })
-////            .then(data => {
-////                if (routeMethod != "multimodalroute") {
-////                    drawExploredNodes(data);
-////                } else {
-////                    drawMultiModalPath(data)
-////                }
-////            })
-////            .catch(error => {
-////				console.log(error)
-////            });
-//  }
-//  
-//  
-//  
-//  
-//  
-//  
-//  function drawPath(path,colorCode) {
-////    if (line) {
-////      map.removeLayer(line);
-////    }
-////    if (oldLineList.length>0) {
-////        oldLineList.forEach(item => map.removeLayer(item));
-////        oldLineList = [];
-////    }
-//    var points = [];
-//    for (var i = 0; i < path.length; i++) {
-//      var coord = path[i];
-//        var point = ol.proj.fromLonLat([coord.y, coord.x]);
-//        points.push(point);
-//    }
-//
-//
-//    var lineString = new ol.geom.LineString(points);
-//    var lineFeature = new ol.Feature({
-//      geometry: lineString
-//    });
-//
-//    var lineStyle = new ol.style.Style({
-//      stroke: new ol.style.Stroke({
-//        color: colorCode,
-//        width: 4,
-//        opacity: 1,
-//        lineDash: [.1, 7]
-//      })
-//    });
-//    lineFeature.setStyle(lineStyle);
-//
-//    var vectorSource = new ol.source.Vector({
-//      features: [lineFeature]
-//    });
-//
-//    line = new ol.layer.Vector({
-//      source: vectorSource
-//    });
-//    map.addLayer(line);
-//  }
-//
-//
 //let ptCount =0;
 //function drawMultiModalPath(path) {
 //    // Önceki katmanları temizle
@@ -518,7 +306,7 @@ var WALK_LINE_STYLE = new ol.style.Style({
 let counter = 0;
 let firstMarkerLayer;
 let secondMarkerLayer;
-let routeMethod = "shortestpath";
+let routeMethod = "shortestpathbidi"; // shortestpath, shortestpathbidi
 let pathMethod = "singlepath";
 let ptCount = 0;
 /**** -------- *****/
@@ -620,7 +408,7 @@ function drawMultiModalPath(path) {
 
 /**** EVENT LISTENERS ****/
 document.getElementById('toggleBtn').addEventListener('change', function(e) {
-    routeMethod = e.target.checked ?  "multimodalroute" : "shortestpath";
+    routeMethod = e.target.checked ?  "multimodalroute" : "shortestpathbidi";
 });
 
 document.getElementById('alternateBtn').addEventListener('change', function(e) {
