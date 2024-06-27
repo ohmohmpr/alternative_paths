@@ -165,7 +165,7 @@ public class ShortestPathService {
         BDV<Point2D, GeofabrikData> dj = new BDV<Point2D, GeofabrikData>(graphHolder.getRoadGraph());
         
         dj.run(sourceNode,targetNode);
-//        dj.run(targetNode,sourceNode);
+
         List<AlternativePaths<Point2D, GeofabrikData>> ALTpaths = dj.getPaths();
         System.out.println("size = " + ALTpaths.size());
 

@@ -446,7 +446,8 @@ async function findShortestPath() {
     const [lon1, lat1] = [parseFloat(firstCoordInput.value.split(",")[0]), parseFloat(firstCoordInput.value.split(",")[1])];
     const [lon2, lat2] = [parseFloat(secondCoordInput.value.split(",")[0]), parseFloat(secondCoordInput.value.split(",")[1])];
 
-    let url = `${BASE_URL}/${GROUP_NAME}/ex1/${pathMethod === "singlepath" ? routeMethod : 'alternativebdv'}?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
+    let url = `${BASE_URL}/${GROUP_NAME}/ex1/${pathMethod}-${routeMethod}?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
+
     document.getElementById("overlay").style.display = "flex";
     const res = await fetch(url);
     const data = await res.json();
