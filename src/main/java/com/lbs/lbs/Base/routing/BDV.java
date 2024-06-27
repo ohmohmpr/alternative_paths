@@ -139,7 +139,7 @@ public class BDV<V, E extends WeightedArcData> {
 		dist_F[source.getId()] = starttime; // WHY 
 		pred_F[source.getId()] = null; // make sense but what is the default value?
 
-		dist_B[source.getId()] = starttime; // WHY 
+		dist_B[source.getId()] = 0; // WHY 
 		pred_B[source.getId()] = null; // make sense but what is the default value?
 		double weightOfArc;
 
@@ -175,6 +175,7 @@ public class BDV<V, E extends WeightedArcData> {
 			// top_s < top_t -> Forward search
 			if (curr_dist_F <= curr_dist_B) {
 				queue_F.extractMin();
+				//iterate throw the neighbors of u
 				for (Iterator<DiGraphNode<V, E>> it = nit.getIterator(u_F); it.hasNext();) {
 					DiGraphNode<V, E> v = it.next();
 
@@ -186,7 +187,7 @@ public class BDV<V, E extends WeightedArcData> {
 						commonNodeID = v.getId();
 						commonNodeIDcounter = commonNodeIDcounter + 1;
 						// save the path
-						shortestPathLength = dist_F[u_F.getId()] + dist_B[u_B.getId()];
+						shortestPathLength = dist_F[v.getId()] + dist_B[v.getId()];
 						List<DiGraphNode<V, E>> path_for_add = getPath();
 						AlternativePaths<V, E> alternativePath = new AlternativePaths<>(commonNodeID, shortestPathLength, path_for_add);
 
@@ -229,7 +230,7 @@ public class BDV<V, E extends WeightedArcData> {
 					if (items_F[v.getId()] != null) {
 						commonNodeID = v.getId();
 						commonNodeIDcounter = commonNodeIDcounter + 1;
-						shortestPathLength = dist_F[u_F.getId()] + dist_B[u_B.getId()];
+						shortestPathLength = dist_F[v.getId()] + dist_B[v.getId()];
 						// save the path
 						List<DiGraphNode<V, E>> path_for_add = getPath();
 						AlternativePaths<V, E> alternativePath = new AlternativePaths<>(commonNodeID, shortestPathLength, path_for_add);
@@ -237,9 +238,9 @@ public class BDV<V, E extends WeightedArcData> {
 						// check whether the path is the optimal path 
 						if (optimalShortestPathLength > shortestPathLength) {
 							// check whether the optimal path is the first path
-							if (optimalShortestPath != null) { //-> necessary??
-								//alternativePaths.add(this.optimalShortestPath);
-							}
+							/*if (optimalShortestPath != null) { //-> necessary??
+								alternativePaths.add(this.optimalShortestPath);
+							}*/
 							optimalShortestPathLength = shortestPathLength;
 							this.optimalShortestPath  = alternativePath;
 							System.out.println("optimalShortestPath " + optimalShortestPathLength);
@@ -321,7 +322,7 @@ public class BDV<V, E extends WeightedArcData> {
 		while (current_F != null) {
 			path.addFirst(current_F);
 			current_F = pred_F[current_F.getId()];
-			
+
 		}
 		// add the nodes form the backward search
 		DiGraphNode<V, E> current_B = items_B[commonNodeID].getValue();
@@ -335,221 +336,278 @@ public class BDV<V, E extends WeightedArcData> {
 
 	public ArrayList<AlternativePaths<V, E>>  getPaths() {
 		// compare
-		
+
 		//limited sharing
 		ArrayList<AlternativePaths<V,E>> ls_alternativePaths = new ArrayList<AlternativePaths<V,E>>();
-		ArrayList<DiGraphNode<V, E>> optimal = this.optimalShortestPath.path;
-		System.out.println("alternativePaths: " + alternativePaths.size());
+		ls_alternativePaths.add(this.optimalShortestPath);
+
+		double  [] opt_dist = getoptdistArray();
+		int s = this.optimalShortestPath.path.size()-1;
+		System.out.println("opt_dist[last] = " + opt_dist[this.optimalShortestPath.path.get(s).getId()]);
+		System.out.println("opt_dist  = " + this.optimalShortestPathLength);
+		System.out.println("diff = " + (opt_dist[this.optimalShortestPath.path.get(s).getId()]- this.optimalShortestPathLength));
+
 		int p = 0;
 		for (AlternativePaths<V, E> path : alternativePaths) {
 			p++;
-			boolean long_shar = false;
-			int i = 0;
 			double d = 0;
-			//compare at the beginning
-			double d_1 = 0;
-			while (path.path.get(i) == optimal.get(i) && long_shar==false && i<path.path.size() && i<optimal.size()){
-				d = dist_F[optimal.get(i).getId()];
-				//if the distance is not anymore saved in dist_F
-				if (d == 0 && i > 0) {
-					double dB = dist_B[optimal.get(i).getId()] - dist_B[optimal.get(i+1).getId()] ;
-					d = d_1 + dB;
-					
+			int same_node_counter = 0;
+			int prev_node_id = 0;
+			for (DiGraphNode<V, E> node: path.path) {
+
+				if (opt_dist[node.getId()] != 0 ) {
+					if( same_node_counter == 0) {
+						prev_node_id = node.getId();
+						same_node_counter++;
+					}
+					if ( same_node_counter > 0) {
+						d = d + opt_dist[node.getId()] - opt_dist[prev_node_id];
+					}
+
+				}else {
+					same_node_counter = 0;
 				}
-				d_1 = d;
-				if ( d>gamma*optimalShortestPathLength) {
-					long_shar = true;
-				}
-				i++;
+
 			}
-			
-			//compare at the end
-			int k = path.path.size()-1;
-			int j = optimal.size()-1;
-			while (path.path.get(k) == optimal.get(j) && long_shar==false&& k >=0 && j>=0 ){
-				if ( dist_B[path.path.get(k).getId()] + d > gamma*optimalShortestPathLength) {
-					long_shar = true;
-				}
-				k--;
-				j--;
-			// save the path that do share less than gamma*dist_opt of the path
-			}if (long_shar==false) {
-				//System.out.println("gamma*optimalShortestPathLength = " + gamma*optimalShortestPathLength);
-				//System.out.println("dist_B[path.path.get(k).getId()] + d = " + dist_B[path.path.get(k).getId()] + d);
+			if (d< (gamma*this.optimalShortestPathLength)) {
 				ls_alternativePaths.add(path);
 			}
-
+				
 		}
 		System.out.println("investigated paths " + p);
 		System.out.println("admissable path " + ls_alternativePaths.size());
-
 		return ls_alternativePaths;
 	}
-	
-	
 
-	public List<DiGraphNode<V, E>> getExploredNodes(DiGraphNode<V, E> target) {
-		LinkedList<DiGraphNode<V, E>> path = new LinkedList<DiGraphNode<V, E>>();
+		public double [] getoptdistArray() {
+			double optdist_F[] = new double[this.dist_F.length];
+			DiGraphNode<V, E> node_prv = null;
+			boolean F = true;
+			boolean start=true;
+			int i =0;
+			for (DiGraphNode<V, E> node: this.optimalShortestPath.path) {
+				//System.out.println("dist_F[node.getId()] = " + dist_F[node.getId()]);
+				if (start){
+					optdist_F[node.getId()] = this.dist_F[node.getId()];	
+					node_prv = node;
+					start = false;
+				}else {
+					if (this.dist_F[node.getId()] != 0.0 && F) {
+						optdist_F[node.getId()] = this.dist_F[node.getId()];	
+						node_prv = node;
+					}else {
+						F = false;
+						optdist_F[node.getId()] = optdist_F[node_prv.getId()] + this.dist_B[node_prv.getId()] - this.dist_B[node.getId()];
+
+						//System.out.println("optdist_F[node_prv.getId()] = " + optdist_F[node_prv.getId()]+ " , this.dist_B[node_prv.getId()] = "+ this.dist_B[node_prv.getId()] + " ,this.dist_B[node.getId() = "+ ( this.dist_B[node.getId()]));
+						node_prv = node;
+					}}
+				i++;
+				//System.out.println("d = " + optdist_F[node.getId()]);
+
+			}//System.out.println("i = " + i);
+			//System.out.println("i = " + i + " this.optimalShortestPath.path.size() -1: " + (this.optimalShortestPath.path.size() -1));
+			/*	
+			System.out.println("i = " + i + " ,dB = " + (-this.dist_B[node_id]+this.dist_B[this.optimalShortestPath.path.get(i-1).getId()]));
+			//System.out.println("optdist_F[node_id] = " + optdist_F[node_id]);
+			i++;
+			node_id = this.optimalShortestPath.path.get(i).getId();
+
+		}*/
+			return optdist_F;
+		}
+
+		public boolean [] getinsideArray(ArrayList<DiGraphNode<V, E>> path, double[] dist ) {
+			boolean inside[] = new boolean[dist.length];
+			for (DiGraphNode<V, E> node : path) {
+				inside[node.getId()] = true;
+			}
+			return inside;
+		}
+		/*LinkedList<DiGraphNode<V, E>> path = new LinkedList<DiGraphNode<V, E>>();
 
 		if (stamps_F[commonNodeID] < currentStamp || stamps_B[commonNodeID] < currentStamp) {
 			return new ArrayList<DiGraphNode<V, E>>();
 		}
+		// add the nodes form the forward search
+		DiGraphNode<V, E> current_F = items_F[commonNodeID].getValue();
+		while (current_F != null) {
+			path.addFirst(current_F);
+			current_F = pred_F[current_F.getId()];
 
-		for(int i=0;i<stamps_F.length;i++)
-			if (stamps_F[i] > 0) {
-				path.addFirst(pred_F[i]);
-			}
-
-		for(int i=0;i<stamps_B.length;i++)
-			if (stamps_B[i] > 0) {
-				path.addFirst(pred_B[i]);
-			}
-
-		return new ArrayList<DiGraphNode<V, E>>(path);
-	}
-
-	//	public List<DiGraphArc<V, E>> getPathArcs(DiGraphNode<V, E> target) {
-	//		LinkedList<DiGraphArc<V, E>> path = new LinkedList<DiGraphArc<V, E>>();
-	//
-	//		if (stamps[target.getId()] < currentStamp) {
-	//			return new ArrayList<DiGraphArc<V, E>>();
-	//		}
-	//
-	//		DiGraphNode<V, E> prev = null;
-	//		DiGraphNode<V, E> current = target;
-	//		while (current != null) {
-	//			if (prev == null) {
-	//				prev = current;
-	//				current = pred[prev.getId()];
-	//				continue;
-	//			}
-	//			path.addFirst(current.getFirstOutgoingArcTo(prev));
-	//			prev = current;
-	//			current = pred[prev.getId()];
-	//		}
-	//
-	//		return new ArrayList<DiGraphArc<V, E>>(path);
-	//	}
-
-	/**
-	 * Assumes that the dijkstra has been executed before. Returns the distance of
-	 * <code>node</code> to the start node of the last run.
-	 * 
-	 * @param node
-	 * @return distance of the node to the start node of the last run. If the node
-	 *         is not reachable from the start node, then it returns
-	 *         Double.MAX_VALUE.
-	 */
-	//	public double getDistance(DiGraphNode<V, E> node) {
-	//		return stamps[node.getId()] < currentStamp ? Double.MAX_VALUE : dist[node.getId()];
-	//	}
-
-	public void setStarttime(long starttime) {
-		this.starttime = starttime;
-	}
-	
-	
-
-	public interface NodeVisitor<V> {
-		/**
-		 * Decides whether the query should be stopped at a specific node.
-		 * 
-		 * @param node node data of current minimum node
-		 * @return stop query?
-		 */
-		boolean visit(V node);
-	}
-
-	public static interface NodeIterator<V, E extends WeightedArcData> {
-		/**
-		 * Returns an iterator of all adjacent nodes of node <code>s</code>.
-		 * 
-		 * @param s node to get the iterator of
-		 * @return Iterator over all adjacent nodes
-		 */
-		Iterator<DiGraphNode<V, E>> getIterator(DiGraphNode<V, E> s);
-
-		/**
-		 * Returns the weight of the 'arc' from node <code>s</code> to node
-		 * <code>t</code>. As the iterator can be used freely, this 'arc' must not be an
-		 * actual arc in the graph.
-		 * 
-		 * @param s source node of the arc
-		 * @param t target node of the arc
-		 * @return weight of the arc
-		 */
-		double getWeightOfCurrentArc(DiGraphNode<V, E> s, DiGraphNode<V, E> t);
-	}
-
-	/**
-	 * NodeIterator that depends mainly on the graph structure. Additional
-	 * adjacencies may be added via an additional NodeIterator.
-	 */
-	public static class BasicAdjacentNodeIterator<V, E extends WeightedArcData> implements NodeIterator<V, E> {
-
-		protected DiGraphArc<V, E> currArc;
-		protected NodeIterator<V, E> addIt;
-		protected boolean start;
-
-		public BasicAdjacentNodeIterator(NodeIterator<V, E> additionalIterator) {
-			this.addIt = additionalIterator;
-			this.start = true;
-			this.currArc = null;
+		}
+		// add the nodes form the backward search
+		DiGraphNode<V, E> current_B = items_B[commonNodeID].getValue();
+		while (current_B != null) {
+			path.addLast(current_B);
+			current_B = pred_B[current_B.getId()];
 		}
 
-		@Override
-		public double getWeightOfCurrentArc(DiGraphNode<V, E> s, DiGraphNode<V, E> t) {
-			if (currArc != null) {
-				return currArc.getArcData().getValue();
-			}
-			if (start) {
-				return Double.NaN;
-			}
-			return addIt.getWeightOfCurrentArc(s, t);
-		}
+		return new ArrayList<DiGraphNode<V, E>>(path);*/
+		//}
 
-		@Override
-		public Iterator<DiGraphNode<V, E>> getIterator(DiGraphNode<V, E> s) {
-			Iterator<DiGraphArc<V, E>> it = s.getOutgoingArcs().iterator();
-			Iterator<DiGraphNode<V, E>> extraIt;
-			if (addIt == null) {
-				extraIt = null;
-			} else {
-				extraIt = addIt.getIterator(s);
-			}
-			return new Iterator<DiGraphNode<V, E>>() {
+		public List<DiGraphNode<V, E>> getExploredNodes(DiGraphNode<V, E> target) {
+			LinkedList<DiGraphNode<V, E>> path = new LinkedList<DiGraphNode<V, E>>();
 
-				@Override
-				public boolean hasNext() {
-					if (it.hasNext()) {
-						return true;
-					}
-					if (extraIt == null) {
-						return false;
-					}
-					return extraIt.hasNext();
+			if (stamps_F[commonNodeID] < currentStamp || stamps_B[commonNodeID] < currentStamp) {
+				return new ArrayList<DiGraphNode<V, E>>();
+			}
+
+			for(int i=0;i<stamps_F.length;i++)
+				if (stamps_F[i] > 0) {
+					path.addFirst(pred_F[i]);
 				}
 
-				@Override
-				public DiGraphNode<V, E> next() {
-					start = false;
-					if (it.hasNext()) {
-						currArc = it.next();
-						return currArc.getTarget();
-					}
-					if (extraIt == null) {
-						return null;
-					}
-					currArc = null;
-					return extraIt.next();
+			for(int i=0;i<stamps_B.length;i++)
+				if (stamps_B[i] > 0) {
+					path.addFirst(pred_B[i]);
 				}
-			};
+
+			return new ArrayList<DiGraphNode<V, E>>(path);
 		}
+
+		//	public List<DiGraphArc<V, E>> getPathArcs(DiGraphNode<V, E> target) {
+		//		LinkedList<DiGraphArc<V, E>> path = new LinkedList<DiGraphArc<V, E>>();
+		//
+		//		if (stamps[target.getId()] < currentStamp) {
+		//			return new ArrayList<DiGraphArc<V, E>>();
+		//		}
+		//
+		//		DiGraphNode<V, E> prev = null;
+		//		DiGraphNode<V, E> current = target;
+		//		while (current != null) {
+		//			if (prev == null) {
+		//				prev = current;
+		//				current = pred[prev.getId()];
+		//				continue;
+		//			}
+		//			path.addFirst(current.getFirstOutgoingArcTo(prev));
+		//			prev = current;
+		//			current = pred[prev.getId()];
+		//		}
+		//
+		//		return new ArrayList<DiGraphArc<V, E>>(path);
+		//	}
+
+		/**
+		 * Assumes that the dijkstra has been executed before. Returns the distance of
+		 * <code>node</code> to the start node of the last run.
+		 * 
+		 * @param node
+		 * @return distance of the node to the start node of the last run. If the node
+		 *         is not reachable from the start node, then it returns
+		 *         Double.MAX_VALUE.
+		 */
+		//	public double getDistance(DiGraphNode<V, E> node) {
+		//		return stamps[node.getId()] < currentStamp ? Double.MAX_VALUE : dist[node.getId()];
+		//	}
+
+		public void setStarttime(long starttime) {
+			this.starttime = starttime;
+		}
+
+
+
+		public interface NodeVisitor<V> {
+			/**
+			 * Decides whether the query should be stopped at a specific node.
+			 * 
+			 * @param node node data of current minimum node
+			 * @return stop query?
+			 */
+			boolean visit(V node);
+		}
+
+		public static interface NodeIterator<V, E extends WeightedArcData> {
+			/**
+			 * Returns an iterator of all adjacent nodes of node <code>s</code>.
+			 * 
+			 * @param s node to get the iterator of
+			 * @return Iterator over all adjacent nodes
+			 */
+			Iterator<DiGraphNode<V, E>> getIterator(DiGraphNode<V, E> s);
+
+			/**
+			 * Returns the weight of the 'arc' from node <code>s</code> to node
+			 * <code>t</code>. As the iterator can be used freely, this 'arc' must not be an
+			 * actual arc in the graph.
+			 * 
+			 * @param s source node of the arc
+			 * @param t target node of the arc
+			 * @return weight of the arc
+			 */
+			double getWeightOfCurrentArc(DiGraphNode<V, E> s, DiGraphNode<V, E> t);
+		}
+
+		/**
+		 * NodeIterator that depends mainly on the graph structure. Additional
+		 * adjacencies may be added via an additional NodeIterator.
+		 */
+		public static class BasicAdjacentNodeIterator<V, E extends WeightedArcData> implements NodeIterator<V, E> {
+
+			protected DiGraphArc<V, E> currArc;
+			protected NodeIterator<V, E> addIt;
+			protected boolean start;
+
+			public BasicAdjacentNodeIterator(NodeIterator<V, E> additionalIterator) {
+				this.addIt = additionalIterator;
+				this.start = true;
+				this.currArc = null;
+			}
+
+			@Override
+			public double getWeightOfCurrentArc(DiGraphNode<V, E> s, DiGraphNode<V, E> t) {
+				if (currArc != null) {
+					return currArc.getArcData().getValue();
+				}
+				if (start) {
+					return Double.NaN;
+				}
+				return addIt.getWeightOfCurrentArc(s, t);
+			}
+
+			@Override
+			public Iterator<DiGraphNode<V, E>> getIterator(DiGraphNode<V, E> s) {
+				Iterator<DiGraphArc<V, E>> it = s.getOutgoingArcs().iterator();
+				Iterator<DiGraphNode<V, E>> extraIt;
+				if (addIt == null) {
+					extraIt = null;
+				} else {
+					extraIt = addIt.getIterator(s);
+				}
+				return new Iterator<DiGraphNode<V, E>>() {
+
+					@Override
+					public boolean hasNext() {
+						if (it.hasNext()) {
+							return true;
+						}
+						if (extraIt == null) {
+							return false;
+						}
+						return extraIt.hasNext();
+					}
+
+					@Override
+					public DiGraphNode<V, E> next() {
+						start = false;
+						if (it.hasNext()) {
+							currArc = it.next();
+							return currArc.getTarget();
+						}
+						if (extraIt == null) {
+							return null;
+						}
+						currArc = null;
+						return extraIt.next();
+					}
+				};
+			}
+		}
+
+		/**
+		 * NodeIterator that depends only on the graph structure.
+		 */
+		protected NodeIterator<V, E> DEFAULT_ADJACENT_NODE_ITERATOR = new BasicAdjacentNodeIterator<V, E>(null);
+
 	}
-
-	/**
-	 * NodeIterator that depends only on the graph structure.
-	 */
-	protected NodeIterator<V, E> DEFAULT_ADJACENT_NODE_ITERATOR = new BasicAdjacentNodeIterator<V, E>(null);
-
-}
