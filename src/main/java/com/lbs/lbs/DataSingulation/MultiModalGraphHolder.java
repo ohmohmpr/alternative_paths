@@ -21,18 +21,15 @@ public class MultiModalGraphHolder {
         }
     }
 
-
-
     private MultiModalRouter<GeofabrikData, GeofabrikData> multiModalGraph;
     private static MultiModalGraphHolder instance;
 
     public static MultiModalGraphHolder getInstance() throws Exception {
 
         if(instance == null){
-            try{
-
+            try {
                 instance = getMultiModalGraphHolder();
-            }catch (Exception e){
+            } catch (Exception e){
                 throw e;
             }
         }
@@ -40,17 +37,17 @@ public class MultiModalGraphHolder {
     }
     private static MultiModalGraphHolder getMultiModalGraphHolder() throws Exception {
         try{
-        File gtfsDir = new File(path + "/gtfs/");
-
-
-        RoadGraph<Point2D, GeofabrikData> roadGraph = RoadGraphHolder.getInstance().getRoadGraph();
-
-        MultiModalRouter<GeofabrikData, GeofabrikData> router = new MultiModalRouter<>(roadGraph, gtfsDir,
-                Router.GEOFABRIK_FACTORY);
-        MultiModalGraphHolder multiModalGraphHolder = new MultiModalGraphHolder();
-        multiModalGraphHolder.setMultiModalGraph(router);
-        return multiModalGraphHolder;
-        }catch (Exception e){
+	        File gtfsDir = new File(path + "/gtfs/");
+	
+	
+	        RoadGraph<Point2D, GeofabrikData> roadGraph = RoadGraphHolder.getInstance().getRoadGraph();
+	
+	        MultiModalRouter<GeofabrikData, GeofabrikData> router = new MultiModalRouter<>(roadGraph, gtfsDir,
+	                Router.GEOFABRIK_FACTORY);
+	        MultiModalGraphHolder multiModalGraphHolder = new MultiModalGraphHolder();
+	        multiModalGraphHolder.setMultiModalGraph(router);
+	        return multiModalGraphHolder;
+        } catch (Exception e){
             throw e;
         }
     }
