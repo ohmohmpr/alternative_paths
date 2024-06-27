@@ -82,7 +82,7 @@ public class ShortestPathService {
         DiGraph.DiGraphNode<Point2D, GeofabrikData> targetNode = graphHolder.findNearestPoint(target);
 
         Dijkstra<Point2D, GeofabrikData> dj = new Dijkstra<Point2D, GeofabrikData>(graphHolder.getRoadGraph());
-        double length = dj.run(sourceNode,targetNode);
+        dj.run(sourceNode,targetNode);
 //        System.out.println(length);
         List<DiGraph.DiGraphNode<Point2D, GeofabrikData>> path = dj.getExploredNodes(targetNode);
 
@@ -135,8 +135,8 @@ public class ShortestPathService {
         DiGraph.DiGraphNode<Point2D, GeofabrikData> targetNode = graphHolder.findNearestPoint(target);
 
         BiDijkstra<Point2D, GeofabrikData> dj = new BiDijkstra<Point2D, GeofabrikData>(graphHolder.getRoadGraph());
-        double length = dj.run(sourceNode,targetNode);
-//        System.out.println(length);
+        dj.run(sourceNode,targetNode);
+
         List<DiGraph.DiGraphNode<Point2D, GeofabrikData>> path = dj.getExploredNodes(targetNode);
 
         List<Coordinate> returnList_nodes = new ArrayList<Coordinate>();
@@ -225,8 +225,8 @@ public class ShortestPathService {
         DiGraph.DiGraphNode<Point2D, GeofabrikData> targetNode = graphHolder.findNearestPoint(target);
 
         BDV<Point2D, GeofabrikData> dj = new BDV<Point2D, GeofabrikData>(graphHolder.getRoadGraph());
-        double length = dj.run(sourceNode,targetNode);
-//        System.out.println(length);
+        dj.run(sourceNode,targetNode);
+
         List<DiGraph.DiGraphNode<Point2D, GeofabrikData>> path = dj.getExploredNodes(targetNode);
 
         List<Coordinate> returnList_nodes = new ArrayList<Coordinate>();
@@ -339,9 +339,6 @@ public class ShortestPathService {
     }
 
     public static Coordinate LatLon2EN (double lat, double lon){
-        Coordinate coordinate = new Coordinate();
-        Date time = new Date();
-        TransportPath transportPath = new TransportPath(coordinate, time, "name","routeName","condition");
         CRS epsg3044 = CRS.fromEpsgCode(3044);
         CRS wgs84 = CRS.fromEpsgCode(4326);
         var fromWgs84 = Transform.apply(wgs84, epsg3044);
