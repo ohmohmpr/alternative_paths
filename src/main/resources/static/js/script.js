@@ -1,170 +1,3 @@
-// var line;
-// var exploredNodes;
-// let counter = 0;
-//
-// var oldZoom = 2;
-// var walkLineStyle = new ol.style.Style({
-//     stroke: new ol.style.Stroke({
-//         color: '#0080ff',
-//         width: 4,
-//         opacity: 1,
-//         lineDash: [.1, 7]
-//     })
-// });
-// var busLineStyle = new ol.style.Style({
-//     stroke: new ol.style.Stroke({
-//         color: '#ec0909',
-//         width: 4,
-//         opacity: 1
-//     })
-// });
-// var tramLineStyle = new ol.style.Style({
-//     stroke: new ol.style.Stroke({
-//         color: '#40ff00',
-//         width: 4,
-//         opacity: 1
-//     })
-// });
-//var departurePointStyle = new ol.style.Style({
-//    stroke: new ol.style.Stroke({
-//        color: '#a4a4a4',
-//        width: 10,
-//        opacity: 1
-//    })
-//});
-//var arrivalPointStyle = new ol.style.Style({
-//    stroke: new ol.style.Stroke({
-//        color: '#b93434',
-//        width: 10,
-//        opacity: 1
-//    })
-//});
-//let ptCount =0;
-//function drawMultiModalPath(path) {
-//    // Önceki katmanları temizle
-////    oldLineList.forEach(item => map.removeLayer(item));
-////    oldLineList = [];
-//    if (line) {
-//        map.removeLayer(line);
-//    }
-//
-//    var path_list = [];
-//    var path_ids = [];
-//    var points = [];
-//
-//    var startCoord = path[0].coordinate;
-//    var startPoint = ol.proj.fromLonLat([startCoord.y, startCoord.x]);
-//    path_ids.push(path[0].condition);
-//    points.push(startPoint);
-//
-//    for (var i = 1; i < path.length; i++) {
-//        var pth = path[i];
-//        var coord = pth.coordinate;
-//        var point = ol.proj.fromLonLat([coord.y, coord.x]);
-//
-//        if (path[i - 1].condition != pth.condition && pth.condition != "arrival") {
-//            path_list.push(points);
-//            points = [];
-//            path_ids.push(pth.condition);
-//        }
-//
-//        if (pth.condition == "departure" || pth.condition == "arrival") {
-//            var pointFeature = new ol.Feature({
-//                geometry: new ol.geom.Point(point)
-//            });
-//            var vectorSource = new ol.source.Vector({
-//                features: [pointFeature]
-//            });
-//            var pointLayer = new ol.layer.Vector({
-//                source: vectorSource
-//            });
-//            pointLayer.setStyle(pth.condition == "departure" ? departurePointStyle : arrivalPointStyle);
-//            map.addLayer(pointLayer);
-////            oldLineList.push(pointLayer);
-//        }
-//
-//        points.push(point);
-//    }
-//    path_list.push(points);
-//
-//    // draw path
-//    for (var i = 0; i < path_ids.length; i++) {
-//        var lineString = new ol.geom.LineString(path_list[i]);
-//        var lineFeature = new ol.Feature({
-//            geometry: lineString
-//        });
-//        lineFeature.setStyle(path_ids[i] == "walk" ? walkLineStyle : (ptCount%2 ==0 ? tramLineStyle : busLineStyle));
-//        if(path_ids[i]!= "walk"){
-//            ptCount +=1;
-//        }
-//
-//
-//        var vectorSource = new ol.source.Vector({
-//            features: [lineFeature]
-//        });
-//        line = new ol.layer.Vector({
-//            source: vectorSource
-//        });
-//        map.addLayer(line);
-////        oldLineList.push(line);
-//    }
-//}
-//
-//  function drawExploredNodes(path) {
-//    if (exploredNodes) {
-//      map.removeLayer(exploredNodes);
-//    }
-////    if (oldLineList.length>0){
-////        oldLineList.forEach(item => map.removeLayer(item));
-////        oldLineList = [];
-////    }
-//    var points = [];
-//    for (var i = 0; i < path.length; i++) {
-//      var coord = path[i];
-//        var point = ol.proj.fromLonLat([coord.y, coord.x]);
-//        points.push(point);
-//    }
-//
-//	
-//	marker3 = new ol.Feature({
-//	  geometry: new ol.geom.MultiPoint(points)
-//	});
-//
-//	const marker3Style =
-//	  new ol.style.Style({
-//		image: new ol.style.Circle({
-//		      radius: 4,
-//		      stroke: new ol.style.Stroke({
-//		        color: '#0000ff'
-//		      }),
-////		      fill: new ol.style.Fill({
-////		        color: '#00ff00'
-////		      })
-//		    }),
-//	});
-//
-//	try {
-//	  marker3.setStyle(marker3Style);
-//	  console.log("done");
-//	}
-//	catch(err) {
-//	  console.log(err.message)
-//	}
-//	
-//    marker3.getGeometry().setCoordinates(points);
-//    exploredNodes = new ol.layer.Vector({
-//      source: new ol.source.Vector({
-//        features: [marker3]
-//      })
-//    });
-//    map.addLayer(exploredNodes);
-//  }
-// document.getElementById('toggleBtn').addEventListener('change', function(e) {
-//     routeMethod = e.target.checked ?  "multimodalroute" : "shortestpath";
-//     console.log(routeMethod);
-//
-// } );
-
 /**** old line array to clear layers ***/
 const oldLineArr = [];
 
@@ -508,3 +341,105 @@ function plot_markers(lon1, lat1, lon2, lat2) {
     addLayer(secondMarkerLayer);
 }
 /************* --------------------- *************/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// var exploredNodes;
+// var walkLineStyle = new ol.style.Style({
+//     stroke: new ol.style.Stroke({
+//         color: '#0080ff',
+//         width: 4,
+//         opacity: 1,
+//         lineDash: [.1, 7]
+//     })
+// });
+// var busLineStyle = new ol.style.Style({
+//     stroke: new ol.style.Stroke({
+//         color: '#ec0909',
+//         width: 4,
+//         opacity: 1
+//     })
+// });
+// var tramLineStyle = new ol.style.Style({
+//     stroke: new ol.style.Stroke({
+//         color: '#40ff00',
+//         width: 4,
+//         opacity: 1
+//     })
+// });
+//var departurePointStyle = new ol.style.Style({
+//    stroke: new ol.style.Stroke({
+//        color: '#a4a4a4',
+//        width: 10,
+//        opacity: 1
+//    })
+//});
+//var arrivalPointStyle = new ol.style.Style({
+//    stroke: new ol.style.Stroke({
+//        color: '#b93434',
+//        width: 10,
+//        opacity: 1
+//    })
+//});
+//
+//  function drawExploredNodes(path) {
+//    if (exploredNodes) {
+//      map.removeLayer(exploredNodes);
+//    }
+////    if (oldLineList.length>0){
+////        oldLineList.forEach(item => map.removeLayer(item));
+////        oldLineList = [];
+////    }
+//    var points = [];
+//    for (var i = 0; i < path.length; i++) {
+//      var coord = path[i];
+//        var point = ol.proj.fromLonLat([coord.y, coord.x]);
+//        points.push(point);
+//    }
+//
+//	
+//	marker3 = new ol.Feature({
+//	  geometry: new ol.geom.MultiPoint(points)
+//	});
+//
+//	const marker3Style =
+//	  new ol.style.Style({
+//		image: new ol.style.Circle({
+//		      radius: 4,
+//		      stroke: new ol.style.Stroke({
+//		        color: '#0000ff'
+//		      }),
+////		      fill: new ol.style.Fill({
+////		        color: '#00ff00'
+////		      })
+//		    }),
+//	});
+//
+//	try {
+//	  marker3.setStyle(marker3Style);
+//	  console.log("done");
+//	}
+//	catch(err) {
+//	  console.log(err.message)
+//	}
+//	
+//    marker3.getGeometry().setCoordinates(points);
+//    exploredNodes = new ol.layer.Vector({
+//      source: new ol.source.Vector({
+//        features: [marker3]
+//      })
+//    });
+//    map.addLayer(exploredNodes);
+//  }
