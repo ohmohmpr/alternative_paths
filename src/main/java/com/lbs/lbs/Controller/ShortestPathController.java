@@ -39,62 +39,60 @@ public class ShortestPathController {
             return new ResponseEntity(e.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
-    @GetMapping("/shortestpath")
-    public ResponseEntity<List<Coordinate>> simpleShortestPathController(@RequestParam double lat1,@RequestParam double lon1,@RequestParam double lat2,@RequestParam double lon2){
-        /**
-         * This Function's inputs are latitude and longitude, represents source and target locations
-         * returns list of the shortest path coordinates as latitude and longitude*/
-
-        try {
-            List<Coordinate> path = ShortestPathService.getShortestPath(lat1, lon1, lat2, lon2);
-            return new ResponseEntity(path, HttpStatus.OK);
-        } catch (Exception e){
-            return new ResponseEntity(e.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
-        }
-
-    }
+//    @GetMapping("/shortestpath")
+//    public ResponseEntity<List<Coordinate>> simpleShortestPathController(@RequestParam double lat1,@RequestParam double lon1,@RequestParam double lat2,@RequestParam double lon2){
+//        /**
+//         * This Function's inputs are latitude and longitude, represents source and target locations
+//         * returns list of the shortest path coordinates as latitude and longitude*/
+//
+//        try {
+//            List<Coordinate> path = ShortestPathService.getShortestPath(lat1, lon1, lat2, lon2);
+//            return new ResponseEntity(path, HttpStatus.OK);
+//        } catch (Exception e){
+//            return new ResponseEntity(e.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
+//        }
+//
+//    }
     
 
-    @GetMapping("/explorednodes")
-    public ResponseEntity<List<Coordinate>> exploredNodesController(@RequestParam double lat1,@RequestParam double lon1,@RequestParam double lat2,@RequestParam double lon2){
-        try {
-            List<Coordinate> path = ShortestPathService.getExploredNodes(lat1, lon1, lat2, lon2);
-        	System.out.println(HttpStatus.OK);
-            return new ResponseEntity(path, HttpStatus.OK);
-        } catch (Exception e){
-        	System.out.println(e);
-            return new ResponseEntity(e.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
-        }
-    }
+//    @GetMapping("/explorednodes")
+//    public ResponseEntity<List<Coordinate>> exploredNodesController(@RequestParam double lat1,@RequestParam double lon1,@RequestParam double lat2,@RequestParam double lon2){
+//        try {
+//            List<Coordinate> path = ShortestPathService.getExploredNodes(lat1, lon1, lat2, lon2);
+//        	System.out.println(HttpStatus.OK);
+//            return new ResponseEntity(path, HttpStatus.OK);
+//        } catch (Exception e){
+//        	System.out.println(e);
+//            return new ResponseEntity(e.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
+//        }
+//    }
 
 
-    @GetMapping("/shortestpathbidi")
+    @GetMapping("/singlepath-shortestpathbidi")
     public ResponseEntity<List<Coordinate>> simpleShortestPathBiDiController(@RequestParam double lat1,@RequestParam double lon1,@RequestParam double lat2,@RequestParam double lon2){
         /**
          * This Function's inputs are latitude and longitude, represents source and target locations
          * returns list of the shortest path coordinates as latitude and longitude*/
-
         try {
             List<Coordinate> path = ShortestPathService.getShortestPathBiDi(lat1, lon1, lat2, lon2);
             return new ResponseEntity(path, HttpStatus.OK);
         } catch (Exception e){
             return new ResponseEntity(e.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
         }
-
     }
     
 
-    @GetMapping("/explorednodesbidi")
-    public ResponseEntity<List<Coordinate>> getExploredNodesBiDi(@RequestParam double lat1,@RequestParam double lon1,@RequestParam double lat2,@RequestParam double lon2){
-        try {
-            List<Coordinate> path = ShortestPathService.getExploredNodesBiDi(lat1, lon1, lat2, lon2);
-        	System.out.println(HttpStatus.OK);
-            return new ResponseEntity(path, HttpStatus.OK);
-        } catch (Exception e){
-        	System.out.println(e);
-            return new ResponseEntity(e.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
-        }
-    }
+//    @GetMapping("/explorednodesbidi")
+//    public ResponseEntity<List<Coordinate>> getExploredNodesBiDi(@RequestParam double lat1,@RequestParam double lon1,@RequestParam double lat2,@RequestParam double lon2){
+//        try {
+//            List<Coordinate> path = ShortestPathService.getExploredNodesBiDi(lat1, lon1, lat2, lon2);
+//        	System.out.println(HttpStatus.OK);
+//            return new ResponseEntity(path, HttpStatus.OK);
+//        } catch (Exception e){
+//        	System.out.println(e);
+//            return new ResponseEntity(e.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
+//        }
+//    }
 
 //    @GetMapping("/shortestpathbdv")
 //    public ResponseEntity<List<Coordinate>> simpleShortestPathBDVController(@RequestParam double lat1,@RequestParam double lon1,@RequestParam double lat2,@RequestParam double lon2){
@@ -111,7 +109,7 @@ public class ShortestPathController {
 //
 //    }
 
-    @GetMapping("/alternativebdv")
+    @GetMapping("/alternativepath-shortestpathbidi")
     public ResponseEntity<List<List<TransportPath>>> simpleShortestPathBDVController(@RequestParam double lat1,@RequestParam double lon1,@RequestParam double lat2,@RequestParam double lon2){
         /**
          * This Function's inputs are latitude and longitude, represents source and target locations
@@ -127,47 +125,19 @@ public class ShortestPathController {
 
     }
 
-    @GetMapping("/explorednodesbdv")
-    public ResponseEntity<List<Coordinate>> getExploredNodesBDV(@RequestParam double lat1,@RequestParam double lon1,@RequestParam double lat2,@RequestParam double lon2){
-        try {
-            List<Coordinate> path = ShortestPathService.getExploredNodesBDV(lat1, lon1, lat2, lon2);
-        	System.out.println(HttpStatus.OK);
-            return new ResponseEntity(path, HttpStatus.OK);
-        } catch (Exception e){
-        	System.out.println(e);
-            return new ResponseEntity(e.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
-        }
-    }
+//    @GetMapping("/explorednodesbdv")
+//    public ResponseEntity<List<Coordinate>> getExploredNodesBDV(@RequestParam double lat1,@RequestParam double lon1,@RequestParam double lat2,@RequestParam double lon2){
+//        try {
+//            List<Coordinate> path = ShortestPathService.getExploredNodesBDV(lat1, lon1, lat2, lon2);
+//        	System.out.println(HttpStatus.OK);
+//            return new ResponseEntity(path, HttpStatus.OK);
+//        } catch (Exception e){
+//        	System.out.println(e);
+//            return new ResponseEntity(e.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
+//        }
+//    }
 
-    @GetMapping("/shortestpathbidiitrt")
-    public ResponseEntity<List<Coordinate>> simpleShortestPathBiDiITRTController(@RequestParam double lat1,@RequestParam double lon1,@RequestParam double lat2,@RequestParam double lon2){
-        /**
-         * This Function's inputs are latitude and longitude, represents source and target locations
-         * returns list of the shortest path coordinates as latitude and longitude*/
-
-        try {
-            List<Coordinate> path = ShortestPathService.getShortestPathBiDiITRT(lat1, lon1, lat2, lon2);
-            return new ResponseEntity(path, HttpStatus.OK);
-        } catch (Exception e){
-            return new ResponseEntity(e.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
-        }
-
-    }
-    
-
-    @GetMapping("/explorednodesbidiitrt")
-    public ResponseEntity<List<Coordinate>> getExploredNodesBiDiITRT(@RequestParam double lat1,@RequestParam double lon1,@RequestParam double lat2,@RequestParam double lon2){
-        try {
-            List<Coordinate> path = ShortestPathService.getExploredNodesBiDiITRT(lat1, lon1, lat2, lon2);
-        	System.out.println(HttpStatus.OK);
-            return new ResponseEntity(path, HttpStatus.OK);
-        } catch (Exception e){
-        	System.out.println(e);
-            return new ResponseEntity(e.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
-        }
-    }
-
-    @GetMapping("/multimodalroute")
+    @GetMapping("/singlepath-multimodalroute")
     public ResponseEntity<List<Coordinate>> multiModalRouteController(@RequestParam double lat1,
                                                                       @RequestParam double lon1,
                                                                       @RequestParam double lat2,
@@ -185,18 +155,14 @@ public class ShortestPathController {
         }
 
     }
-    @GetMapping("/alternative")
+    @GetMapping("/alternativepath-multimodalroute")
     public ResponseEntity<List<List<TransportPath>>> getAlternativeRoutes(@RequestParam double lat1,
                                                                           @RequestParam double lon1,
                                                                           @RequestParam double lat2,
                                                                           @RequestParam double lon2) throws Exception {
-
-
         try {
             List<List<TransportPath>> alternatives = ShortestPathService.getAlternativeRoutes(lat1, lon1, lat2,lon2,36000);
-
             return new ResponseEntity(alternatives, HttpStatus.OK);
-
         }catch (Exception e){
             return new ResponseEntity(e.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
         }
