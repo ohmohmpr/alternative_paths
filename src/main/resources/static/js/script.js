@@ -440,11 +440,19 @@ MAP.on("click", function (e) {
 
 
 /**** METHODS ******/
-async function findShortestPath() {
+async function findShortestPath(lon1=null, lat1=null, lon2=null, lat2=null) {
 
     clearOldLayers();
-    const [lon1, lat1] = [parseFloat(firstCoordInput.value.split(",")[0]), parseFloat(firstCoordInput.value.split(",")[1])];
-    const [lon2, lat2] = [parseFloat(secondCoordInput.value.split(",")[0]), parseFloat(secondCoordInput.value.split(",")[1])];
+    if (lon1 === null && lat1 === null && lon2 === null && lat2 === null){
+	    [lon1, lat1] = [parseFloat(firstCoordInput.value.split(",")[0]), parseFloat(firstCoordInput.value.split(",")[1])];
+	    [lon2, lat2] = [parseFloat(secondCoordInput.value.split(",")[0]), parseFloat(secondCoordInput.value.split(",")[1])];
+	} else {
+		if (!firstMarkerLayer || !secondMarkerLayer) {
+			plot_markers(lon1, lat1, lon2, lat2);
+		}
+		clearLayer(firstMarkerLayer);
+		clearLayer(secondMarkerLayer);
+	}
 
     let url = `${BASE_URL}/${GROUP_NAME}/ex1/${pathMethod}-${routeMethod}?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
 
@@ -472,6 +480,31 @@ async function findShortestPath() {
         clearOldLayers();
         data.forEach(pathData => drawMultiModalPath(pathData, true));
     }
+
+	plot_markers(lon1, lat1, lon2, lat2);
+        
     document.getElementById("overlay").style.display = "none";
+}
+/************* --------------------- *************/
+
+/**** UTILS ******/
+function plot_markers(lon1, lat1, lon2, lat2) {
+	
+    MAP.setView(new ol.View({
+	    center: ol.proj.fromLonLat([(lon1 + lon2)/2, (lat1 + lat2)/2]),
+	    zoom: 2,
+	    maxZoom: 20,
+	    minZoom: 2,
+	    extent: [MIN_X, MIN_Y, MAX_X, MAX_Y],
+	}));
+    
+	pos_start = ol.proj.transform([lon1, lat1], "EPSG:4326", "EPSG:3857");
+	pos_end = ol.proj.transform([lon2, lat2], "EPSG:4326", "EPSG:3857");
+    FIRST_MARKER.getGeometry().setCoordinates(pos_start);
+    firstMarkerLayer = createLayerVector([FIRST_MARKER]);
+    addLayer(firstMarkerLayer);
+    SECOND_MARKER.getGeometry().setCoordinates(pos_end);
+    secondMarkerLayer = createLayerVector([SECOND_MARKER]);
+    addLayer(secondMarkerLayer);
 }
 /************* --------------------- *************/

@@ -20,10 +20,6 @@
 	<!-- import OpenLayers -->
 	<script src="https://cdn.jsdelivr.net/npm/ol@v9.2.4/dist/ol.js"></script>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v9.2.4/ol.css">
-	
-<!-- 	<link rel="stylesheet" -->
-<!-- 		href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.9.0/css/ol.css" type="text/css"> -->
-<!-- 	<script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.9.0/build/ol.js"></script> -->
 
 	<!-- own script -->
 	<script src="js/script.js" defer></script>
@@ -126,6 +122,8 @@
 		function toggleForm() {
 			var form = document.getElementById("formSection");
 			form.style.display = form.style.display === "none" ? "block" : "none";
+			var form = document.getElementById("queries");
+			form.style.display = form.style.display === "block" ? "none" : "block";
 		}
 	</script>
 </head>
@@ -165,17 +163,14 @@
 				Multi Modal Route
 			</div>
 		</label>
-
-
-	<!--	<div class="box boxRight">
-			<a href="#"> <img id="logo" src="https://www.geoinfo.uni-bonn.de/favicon.ico"></a>
-		</div>-->
 	</div>
+	
 	<div class="container">
 		<!-- this element will be filled with the map in 'js/main.js' -->
 		<div id="map" class="map"></div>
 		<div class="buttons">
 			<button onclick="toggleForm()">Navigate</button>
+<!-- 			<button id="queries" style="display: none;">Queries</button> -->
 			<div id="formSection" style="display: block;">
 				<form>
 					<label for="coord1">Starting Location:</label>
@@ -185,16 +180,24 @@
 					<input type="text" id="coord2">
 					<br>
 					<button type="button" onclick="findShortestPath()">Find Path</button>
-<!-- 					<button onclick="fetchData()">Fetch Data</button> -->
+				</form>
+			</div>
+			<div id="queries" style="display: none;">
+				<form>					
+					<button type="button" onclick="findShortestPath(7.0338828,50.7266336,7.1653508,50.6988795)">Path1</button>
+					<button type="button" onclick="findShortestPath(7.0176772,50.6979819,7.1494490,50.7298374)">Path2</button>
+					<button type="button" onclick="findShortestPath(7.0237543,50.7643127,7.1889502,50.6938782)">Path3</button>
+					<br>
+					<button type="button" onclick="findShortestPath(7.0143348,50.6826553,7.1478285,50.7634163)">Path4</button>
+					<button type="button" onclick="findShortestPath(7.0157528,50.6892611,7.1898618,50.6932369)">Path5</button>
+					<button type="button" onclick="findShortestPath(7.0776379,50.7613674,7.1572480,50.7180626)">Path6</button>
+					<br>
+					<button type="button" onclick="findShortestPath(7.1896592,50.7462537,7.0107898,50.7356200)">Path7</button>
+					<button type="button" onclick="findShortestPath(7.0603182,50.6988795,7.1410424,50.6982383)">Path8</button>
+					<button type="button" onclick="findShortestPath(7.1892541,50.6966354,7.0749032,50.7240063)">Path9</button>
 				</form>
 			</div>
 		</div>
-	</div>
-
-
-		<!--	<div class="box boxRight">
-                <a href="#"> <img id="logo" src="https://www.geoinfo.uni-bonn.de/favicon.ico"></a>
-            </div>-->
 	</div>
 
 </body>
