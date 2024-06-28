@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import com.lbs.lbs.Base.graph.DiGraph;
 import com.lbs.lbs.Base.graph.DiGraph.DiGraphArc;
@@ -42,6 +41,7 @@ public class BDV<V, E extends WeightedArcData> {
 	protected double epsilon = 0.25; // stretch longest admissible path can be.
 	protected int p = 3; // number of alternative paths.
 	public ArrayList<AlternativePaths<V, E>> alternativePaths;
+	protected String direction = ""; 
 	
 	@SuppressWarnings("unchecked")
 	public BDV(DiGraph<V, E> g) {
@@ -59,9 +59,16 @@ public class BDV<V, E extends WeightedArcData> {
 	}
 	
 
-//	public double getCurrDist() {
-//		return curr_dist;
-//	}
+	public double getCurrDist() {
+		if (direction == "FORWARD") {
+			System.out.println("FORWARD");
+			return curr_dist_F;
+		} else if (direction == "BACKWARD") {
+			System.out.println("BACKWARD");
+			return curr_dist_B;
+		}
+		return 0;
+	}
 
 //	public DiGraphNode<V, E> getPred(int nodeId) {
 //		return pred[nodeId];
@@ -170,6 +177,7 @@ public class BDV<V, E extends WeightedArcData> {
 			}
 			
 			if (curr_dist_F <= curr_dist_B) {
+				direction = "FORWARD";
 				queue_F.extractMin();
 				for (Iterator<DiGraphNode<V, E>> it = nit.getIterator(u_F); it.hasNext();) {
 					DiGraphNode<V, E> v = it.next();
@@ -187,7 +195,7 @@ public class BDV<V, E extends WeightedArcData> {
 						
 						alternativePaths.add(alternativePath);
 						
-						AlternativePaths<V, E> OptimaPath = 	alternativePath;
+//						AlternativePaths<V, E> OptimaPath = 	alternativePath;
 						
 //						System.out.println("sizesizesizesizesizesizesizesize");
 //						System.out.println(alternativePaths.size());
@@ -199,6 +207,7 @@ public class BDV<V, E extends WeightedArcData> {
 					}
 				}
 			} else {
+				direction = "BACKWARD";
 				queue_B.extractMin();
 				for (Iterator<DiGraphNode<V, E>> it = nit.getIterator(u_B); it.hasNext();) {
 					DiGraphNode<V, E> v = it.next();
@@ -289,12 +298,12 @@ public class BDV<V, E extends WeightedArcData> {
 
 	public ArrayList<AlternativePaths<V, E>>  getPaths() {
 		
-		for (AlternativePaths<V, E> path : alternativePaths) {
-			  System.out.println("dist");
-			  System.out.println(path.dist);
-			  System.out.println("path.path");
-			  System.out.println(path.path);
-			}
+//		for (AlternativePaths<V, E> path : alternativePaths) {
+//			  System.out.println("dist");
+//			  System.out.println(path.dist);
+//			  System.out.println("path.path");
+//			  System.out.println(path.path);
+//			}
 		
 		return alternativePaths;
 	}
@@ -351,9 +360,14 @@ public class BDV<V, E extends WeightedArcData> {
 	 *         is not reachable from the start node, then it returns
 	 *         Double.MAX_VALUE.
 	 */
-//	public double getDistance(DiGraphNode<V, E> node) {
-//		return stamps[node.getId()] < currentStamp ? Double.MAX_VALUE : dist[node.getId()];
-//	}
+	public double getDistance(DiGraphNode<V, E> node) {
+		if (direction == "FORWARD") {
+			return stamps_F[node.getId()] < currentStamp ? Double.MAX_VALUE : dist_F[node.getId()];
+		} else if (direction == "BACKWARD") {
+			return stamps_B[node.getId()] < currentStamp ? Double.MAX_VALUE : dist_B[node.getId()];
+		}
+		return Double.MAX_VALUE;
+	}
 
 	public void setStarttime(long starttime) {
 		this.starttime = starttime;

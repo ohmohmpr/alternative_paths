@@ -11,8 +11,10 @@ import com.lbs.lbs.Base.routing.Dijkstra;
 import com.lbs.lbs.Base.routing.BiDijkstra;
 import com.lbs.lbs.Base.routing.BDV;
 import com.lbs.lbs.Base.routing.MultiModalRouter;
+import com.lbs.lbs.Base.routing.MultiModalRouterBDV;
 import com.lbs.lbs.Base.routing.Router;
 import com.lbs.lbs.DataSingulation.MultiModalGraphHolder;
+import com.lbs.lbs.DataSingulation.MultiModalGraphHolderBDV;
 import com.lbs.lbs.DataSingulation.RoadGraphHolder;
 import com.lbs.lbs.Entity.TransportPath;
 import com.vividsolutions.jump.io.IllegalParametersException;
@@ -343,15 +345,20 @@ public class ShortestPathService {
         DiGraph.DiGraphNode<Point2D, GeofabrikData> sourceNode = graphHolder.findNearestPoint(source);
         DiGraph.DiGraphNode<Point2D, GeofabrikData> targetNode = graphHolder.findNearestPoint(target);
 
-        MultiModalGraphHolder mGraphHolder = MultiModalGraphHolder.getInstance();
-        MultiModalRouter<GeofabrikData, GeofabrikData> router = mGraphHolder.getMultiModalGraph();
+        MultiModalGraphHolderBDV mGraphHolderBDV = MultiModalGraphHolderBDV.getInstance();
+        MultiModalRouterBDV<GeofabrikData, GeofabrikData> router = mGraphHolderBDV.getMultiModalGraph();
         router.setStarttime(time);
 
-        List<DiGraph.DiGraphNode<IsoVertex, IsoEdge>> path = router.run(sourceNode, targetNode);
-
-        List<List<TransportPath>> ListListTransportPath = new ArrayList<List<TransportPath>>();
-        ListListTransportPath.add(multiModalPath2TransportPath(path));
+        List<DiGraph.DiGraphNode<IsoVertex, IsoEdge>> nouse_path = router.run(sourceNode, targetNode);
         
+        List<List<TransportPath>> ListListTransportPath = new ArrayList<List<TransportPath>>();
+        
+        ArrayList<AlternativePaths<IsoVertex, IsoEdge>> alternativePaths =  router.getAll();
+		
+		for (AlternativePaths<IsoVertex, IsoEdge> path : alternativePaths) {
+			ListListTransportPath.add(multiModalPath2TransportPath(path.path));
+		}
+
         return ListListTransportPath;
 
     }

@@ -3,6 +3,7 @@ package com.lbs.lbs.Base.routing;
 import com.lbs.lbs.Base.graph.DiGraph;
 import com.lbs.lbs.Base.graph.DiGraph.DiGraphArc;
 import com.lbs.lbs.Base.graph.DiGraph.DiGraphNode;
+import com.lbs.lbs.Base.graph.types.AlternativePaths;
 import com.lbs.lbs.Base.graph.types.Colored;
 import com.lbs.lbs.Base.graph.types.ColoredNode;
 import com.lbs.lbs.Base.graph.types.RoadGraph;
@@ -11,11 +12,14 @@ import com.lbs.lbs.Base.graph.types.multimodal.IsoEdge;
 import com.lbs.lbs.Base.graph.types.multimodal.IsoVertex;
 import com.lbs.lbs.Base.graph.types.multimodal.RoadNode;
 import com.lbs.lbs.Base.io.GTFSLoader;
-import com.lbs.lbs.Base.routing.Dijkstra.NodeIterator;
-import com.lbs.lbs.Base.routing.Dijkstra.NodeVisitor;
+//import com.lbs.lbs.Base.routing.Dijkstra.NodeIterator;
+import com.lbs.lbs.Base.routing.BDV.NodeIterator;
+//import com.lbs.lbs.Base.routing.Dijkstra.NodeVisitor;
+import com.lbs.lbs.Base.routing.BDV.NodeVisitor;
 
 import java.awt.geom.Point2D;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,7 +34,8 @@ public class MultiModalRouterBDV<E_iso extends IsoEdge, E_road extends WalkingDa
 	private DiGraph<IsoVertex, IsoEdge> routingGraph;
 	private DiGraph<ColoredNode, E_road> coloredGraph;
 
-	private Dijkstra<IsoVertex, IsoEdge> dijkstra;
+//	private Dijkstra<IsoVertex, IsoEdge> dijkstra;
+	private BDV<IsoVertex, IsoEdge> bdv;
 	private NodeIterator<IsoVertex, IsoEdge> it;
 	private NodeIterator<IsoVertex, IsoEdge> adj_it;
 	private NodeVisitor<DiGraphNode<IsoVertex, IsoEdge>> visit;
@@ -68,8 +73,10 @@ public class MultiModalRouterBDV<E_iso extends IsoEdge, E_road extends WalkingDa
 		transferNodes = loader.getTransferNodes();
 		transferTimes = loader.getTransferTimes();
 
-		dijkstra = new Dijkstra<>(routingGraph);
-		it = new PublicTransportationIterator(transferNodes, transferTimes, dijkstra, defaultTransferTime);
+//		dijkstra = new Dijkstra<>(routingGraph);
+		bdv = new BDV<>(routingGraph);
+//		it = new PublicTransportationIterator(transferNodes, transferTimes, dijkstra, defaultTransferTime);
+		it = new PublicTransportationIteratorBDV(transferNodes, transferTimes, bdv, defaultTransferTime);
 	}
 
 	/**
@@ -116,61 +123,62 @@ public class MultiModalRouterBDV<E_iso extends IsoEdge, E_road extends WalkingDa
 			coloredGraph.addArc(coloredGraphSource, coloredGraphTarget, factory.createEdgeData(arc.getArcData()));
 		}
 	}
-	public void runReverse(DiGraphNode<Point2D, E_road> originalTarget, long maxTime) {
-		DiGraphNode<IsoVertex, IsoEdge> target = road2routing.get(originalTarget);
-
-		NodeIterator<IsoVertex, IsoEdge> it = new ReversePublicTransportationIterator(transferNodes, transferTimes,
-				dijkstra, defaultTransferTime, starttime);
-		adj_it = new ReverseGeofabrikRoadIterator<>(it);
-		visit = new ReachabilityVisitor(starttime + maxTime, dijkstra);
-
-		dijkstra.run(target, visit, adj_it);
-		lastSource = routing2color.get(target);
-
-		double dist;
-		// road nodes are the first ones in the routing graph
-		for (int i = 0; i < numNodesRoad; ++i) {
-
-			dist = dijkstra.getDistance(routingGraph.getNode(i)) - starttime;
-
-			ColoredNode nodeData = coloredGraph.getNode(i).getNodeData();
-
-			if (dist <= maxTime) {
-				nodeData.setReachability(Colored.REACHABLE, maxTime - dist);
-			} else {
-				nodeData.setReachability(Colored.UNREACHABLE, -1);
-			}
-		}
-	}
+//	public void runReverse(DiGraphNode<Point2D, E_road> originalTarget, long maxTime) {
+//		DiGraphNode<IsoVertex, IsoEdge> target = road2routing.get(originalTarget);
+//
+//		NodeIterator<IsoVertex, IsoEdge> it = new ReversePublicTransportationIterator(transferNodes, transferTimes,
+//				dijkstra, defaultTransferTime, starttime);
+//		adj_it = new ReverseGeofabrikRoadIterator<>(it);
+//		visit = new ReachabilityVisitor(starttime + maxTime, dijkstra);
+//
+//		dijkstra.run(target, visit, adj_it);
+//		lastSource = routing2color.get(target);
+//
+//		double dist;
+//		// road nodes are the first ones in the routing graph
+//		for (int i = 0; i < numNodesRoad; ++i) {
+//
+//			dist = dijkstra.getDistance(routingGraph.getNode(i)) - starttime;
+//
+//			ColoredNode nodeData = coloredGraph.getNode(i).getNodeData();
+//
+//			if (dist <= maxTime) {
+//				nodeData.setReachability(Colored.REACHABLE, maxTime - dist);
+//			} else {
+//				nodeData.setReachability(Colored.UNREACHABLE, -1);
+//			}
+//		}
+//	}
 	@Override
 	public void setStarttime(long starttime) {
 		this.starttime = starttime;
-		this.dijkstra.setStarttime(starttime);
+		this.bdv.setStarttime(starttime);
+//		this.dijkstra.setStarttime(starttime);
 	}
 
 	@Override
 	public void run(DiGraphNode<Point2D, E_road> originalSource, long maxTime) {
-		DiGraphNode<IsoVertex, IsoEdge> source = road2routing.get(originalSource);
-		adj_it = new GeofabrikRoadIterator<>(it);
-		visit = new ReachabilityVisitor(starttime + maxTime, dijkstra);
-
-		dijkstra.run(source, visit, adj_it);
-		lastSource = routing2color.get(source);
-
-		double dist;
-		// road nodes are the first ones in the routing graph
-		for (int i = 0; i < numNodesRoad; ++i) {
-
-			dist = dijkstra.getDistance(routingGraph.getNode(i)) - starttime;
-
-			ColoredNode nodeData = coloredGraph.getNode(i).getNodeData();
-
-			if (dist <= maxTime) {
-				nodeData.setReachability(Colored.REACHABLE, maxTime - dist);
-			} else {
-				nodeData.setReachability(Colored.UNREACHABLE, -1);
-			}
-		}
+//		DiGraphNode<IsoVertex, IsoEdge> source = road2routing.get(originalSource);
+//		adj_it = new GeofabrikRoadIterator<>(it);
+//		visit = new ReachabilityVisitor(starttime + maxTime, dijkstra);
+//
+//		dijkstra.run(source, visit, adj_it);
+//		lastSource = routing2color.get(source);
+//
+//		double dist;
+//		// road nodes are the first ones in the routing graph
+//		for (int i = 0; i < numNodesRoad; ++i) {
+//
+//			dist = dijkstra.getDistance(routingGraph.getNode(i)) - starttime;
+//
+//			ColoredNode nodeData = coloredGraph.getNode(i).getNodeData();
+//
+//			if (dist <= maxTime) {
+//				nodeData.setReachability(Colored.REACHABLE, maxTime - dist);
+//			} else {
+//				nodeData.setReachability(Colored.UNREACHABLE, -1);
+//			}
+//		}
 	}
 
 
@@ -186,14 +194,30 @@ public class MultiModalRouterBDV<E_iso extends IsoEdge, E_road extends WalkingDa
 			DiGraphNode<Point2D, E_road> originalTarget) {
 		DiGraphNode<IsoVertex, IsoEdge> source = road2routing.get(originalSource);
 		DiGraphNode<IsoVertex, IsoEdge> target = road2routing.get(originalTarget);
-		adj_it = new GeofabrikRoadIterator<>(it);
-		visit = new TargetVisitor(target.getId());
+		adj_it = new GeofabrikRoadIteratorBDV<>(it);
+		visit = new TargetVisitorBDV(target.getId());
+		
+		bdv.run(source, target, visit, adj_it);
+//		dj.run(sourceNode,targetNode)
+//		dijkstra.run(source, visit, adj_it);
+//		System.out.println("bdv.getPaths()");
+		
+//		 ArrayList<AlternativePaths<IsoVertex, IsoEdge>>  alternativePaths = bdv.getPaths();
+//		for (AlternativePaths<IsoVertex, IsoEdge> path : alternativePaths) {
+//			  System.out.println("path.path");
+//			  System.out.println(path.path);
+//		}
 
-		dijkstra.run(source, visit, adj_it);
-
-		return dijkstra.getPath(target);
+		return bdv.getPath();
+//		return dijkstra.getPath(target);
+//		return null;
 	}
+	
+	public ArrayList<AlternativePaths<IsoVertex, IsoEdge>> getAll() {
 
+		return bdv.getPaths();
+	}
+	
 	@Override
 	public DiGraphNode<ColoredNode, E_road> getLastSource() {
 		return lastSource;
