@@ -273,7 +273,7 @@ MAP.on("click", function (e) {
 
 
 /**** METHODS ******/
-async function findShortestPath(lon1=null, lat1=null, lon2=null, lat2=null) {
+async function findShortestPath(lon1=null, lat1=null, lon2=null, lat2=null, id=null) {
 
     clearOldLayers();
     if (lon1 === null && lat1 === null && lon2 === null && lat2 === null){
@@ -302,7 +302,7 @@ async function findShortestPath(lon1=null, lat1=null, lon2=null, lat2=null) {
         drawMultiModalPath(data)
     } else if (routeMethod !== "multimodalroute" && pathMethod === "alternativepath") {
         clearOldLayers();
-        colorCode = ["#0080ff", "#FF0000", "#008000"];
+        colorCode = ["#0080ff", "#FF0000", "#008000", "#ffA500"];
         i_c = 0;
         data.forEach(pathData =>  {
 			drawPath(pathData,colorCode[i_c%colorCode.length])
@@ -315,6 +315,7 @@ async function findShortestPath(lon1=null, lat1=null, lon2=null, lat2=null) {
     }
 
 	plot_markers(lon1, lat1, lon2, lat2);
+	changeColor(id);
         
     document.getElementById("overlay").style.display = "none";
 }
@@ -340,6 +341,24 @@ function plot_markers(lon1, lat1, lon2, lat2) {
     secondMarkerLayer = createLayerVector([SECOND_MARKER]);
     addLayer(secondMarkerLayer);
 }
+
+function changeColor(id) {
+
+  if (id !== null) {
+	  document.getElementById("query1").style.color = "#0a55a1";
+	  document.getElementById("query2").style.color = "#0a55a1";
+	  document.getElementById("query3").style.color = "#0a55a1";
+	  document.getElementById("query4").style.color = "#0a55a1";
+	  document.getElementById("query5").style.color = "#0a55a1";
+	  document.getElementById("query6").style.color = "#0a55a1";
+	  document.getElementById("query7").style.color = "#0a55a1";
+	  document.getElementById("query8").style.color = "#0a55a1";
+	  document.getElementById("query9").style.color = "#0a55a1";
+	  document.getElementById(id).style.color = "red";
+  }
+
+}
+
 /************* --------------------- *************/
 
 

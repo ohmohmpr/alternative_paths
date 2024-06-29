@@ -170,7 +170,6 @@
 		<div id="map" class="map"></div>
 		<div class="buttons">
 			<button onclick="toggleForm()">Navigate</button>
-<!-- 			<button id="queries" style="display: none;">Queries</button> -->
 			<div id="formSection" style="display: block;">
 				<form>
 					<label for="coord1">Starting Location:</label>
@@ -183,18 +182,18 @@
 				</form>
 			</div>
 			<div id="queries" style="display: none;">
-				<form>					
-					<button type="button" onclick="findShortestPath(7.0338828,50.7266336,7.1653508,50.6988795)">Path1</button>
-					<button type="button" onclick="findShortestPath(7.0176772,50.6979819,7.1494490,50.7298374)">Path2</button>
-					<button type="button" onclick="findShortestPath(7.0237543,50.7643127,7.1889502,50.6938782)">Path3</button>
+				<form>
+					<button id="query1" type="button" onclick="findShortestPath(7.0338828,50.7266336,7.1653508,50.6988795, this.id)">Query1</button>
+					<button id="query2" type="button" onclick="findShortestPath(7.0176772,50.6979819,7.1494490,50.7298374, this.id)">Query2</button>
+					<button id="query3" type="button" onclick="findShortestPath(7.0237543,50.7643127,7.1889502,50.6938782, this.id)">Query3</button>
 					<br>
-					<button type="button" onclick="findShortestPath(7.0143348,50.6826553,7.1478285,50.7634163)">Path4</button>
-					<button type="button" onclick="findShortestPath(7.0157528,50.6892611,7.1898618,50.6932369)">Path5</button>
-					<button type="button" onclick="findShortestPath(7.0776379,50.7613674,7.1572480,50.7180626)">Path6</button>
+					<button id="query4" type="button" onclick="findShortestPath(7.0839525,50.7275752,7.0962870,50.7324448, this.id)">Query4</button>
+					<button id="query5" type="button" onclick="findShortestPath(7.0157528,50.6892611,7.1898618,50.6932369, this.id)">Query5</button>
+					<button id="query6" type="button" onclick="findShortestPath(7.0776379,50.7613674,7.1572480,50.7180626, this.id)">Query6</button>
 					<br>
-					<button type="button" onclick="findShortestPath(7.1896592,50.7462537,7.0107898,50.7356200)">Path7</button>
-					<button type="button" onclick="findShortestPath(7.0603182,50.6988795,7.1410424,50.6982383)">Path8</button>
-					<button type="button" onclick="findShortestPath(7.1892541,50.6966354,7.0749032,50.7240063)">Path9</button>
+					<button id="query7" type="button" onclick="findShortestPath(7.1896592,50.7462537,7.0107898,50.7356200, this.id)">Query7</button>
+					<button id="query8" type="button" onclick="findShortestPath(7.0603182,50.6988795,7.1410424,50.6982383, this.id)">Query8</button>
+					<button id="query9" type="button" onclick="findShortestPath(7.1892541,50.6966354,7.0749032,50.7240063, this.id)">Query9</button>
 				</form>
 			</div>
 		</div>

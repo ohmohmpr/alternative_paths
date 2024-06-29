@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.io.FileWriter;   // Import the FileWriter class
+import java.io.IOException;  // Import the IOException class to handle errors
 
 @Validated
 @RestController
@@ -75,6 +77,7 @@ public class ShortestPathController {
          * returns list of the shortest path coordinates as latitude and longitude*/
         try {
             List<Coordinate> path = ShortestPathService.getShortestPathBiDi(lat1, lon1, lat2, lon2);
+			System.out.println("\n");
             return new ResponseEntity(path, HttpStatus.OK);
         } catch (Exception e){
             return new ResponseEntity(e.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
@@ -117,7 +120,27 @@ public class ShortestPathController {
 
         try {
             List<List<Coordinate>> alt = ShortestPathService.getAlternativeRoutesBDV(lat1, lon1, lat2, lon2);
+            
+            //debug that the results are not the same.
+//            try {
+//                int c = 0;
+//                for (List<Coordinate> l:alt) {
+//                	FileWriter myWriter = new FileWriter("alternativepath-shortestpathbidi" + c +".txt");
+//                	for (Coordinate cor:l) {
+//                		String x = String.valueOf(cor.x);
+//                		String y = String.valueOf(cor.y);
+//                		myWriter.write(x+", "+y+"\n");
+//                	}
+//                	myWriter.close();
+//                } 
+//                System.out.println("Successfully wrote to the file.");
+//              } catch (IOException e) {
+//                System.out.println("An error occurred.");
+//                e.printStackTrace();
+//            }
+            
             System.out.println(alt.size());
+			System.out.println("\n");
             return new ResponseEntity(alt, HttpStatus.OK);
         } catch (Exception e){
             return new ResponseEntity(e.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
@@ -148,7 +171,7 @@ public class ShortestPathController {
         long time = 36000;
         try {
             List<TransportPath> path = ShortestPathService.getMultiModalRoute(lat1, lon1, lat2, lon2,time);
-
+            
             return new ResponseEntity(path, HttpStatus.OK);
         }catch (Exception e){
             return new ResponseEntity(e.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);

@@ -197,9 +197,9 @@ public class ShortestPathService {
         }
         returnList1.add(new Coordinate(lat2,lon2));
         
-        
-        // --> The between shortest and longest of shortest paths.
-        AlternativePaths<Point2D, GeofabrikData> ALTpath2 = ALTpaths.get((int) (ALTpaths.size()/2));
+
+        // --> The second one.
+        AlternativePaths<Point2D, GeofabrikData> ALTpath2 = ALTpaths.get(1);
         List<DiGraph.DiGraphNode<Point2D, GeofabrikData>> path2 = ALTpath2.path;
         
         List<Coordinate> returnList2 = new ArrayList<>();
@@ -208,24 +208,36 @@ public class ShortestPathService {
             returnList2.add(EN2LatLon(p.getNodeData().getX(),p.getNodeData().getY()));
         }
         returnList2.add(new Coordinate(lat2,lon2));
-
         
-        // --> The longest shortest path
-        AlternativePaths<Point2D, GeofabrikData> ALTpath3 = ALTpaths.get(ALTpaths.size() - 1);
-        System.out.println("ALTpaths.size() - 1 = " + (ALTpaths.size() - 1));
+        // --> The between shortest and longest of shortest paths.
+        AlternativePaths<Point2D, GeofabrikData> ALTpath3 = ALTpaths.get((int) (ALTpaths.size()/2));
         List<DiGraph.DiGraphNode<Point2D, GeofabrikData>> path3 = ALTpath3.path;
         
         List<Coordinate> returnList3 = new ArrayList<>();
         returnList3.add(new Coordinate(lat1,lon1));
         for(DiGraph.DiGraphNode<Point2D, GeofabrikData> p : path3){
-            returnList3.add(EN2LatLon(p.getNodeData().getX(),p.getNodeData().getY()));
+        	returnList3.add(EN2LatLon(p.getNodeData().getX(),p.getNodeData().getY()));
         }
         returnList3.add(new Coordinate(lat2,lon2));
+
+        
+        // --> The longest shortest path
+        AlternativePaths<Point2D, GeofabrikData> ALTpath4 = ALTpaths.get(ALTpaths.size() - 1);
+        System.out.println("ALTpaths.size() - 1 = " + (ALTpaths.size() - 1));
+        List<DiGraph.DiGraphNode<Point2D, GeofabrikData>> path4 = ALTpath4.path;
+        
+        List<Coordinate> returnList4 = new ArrayList<>();
+        returnList4.add(new Coordinate(lat1,lon1));
+        for(DiGraph.DiGraphNode<Point2D, GeofabrikData> p : path4){
+            returnList4.add(EN2LatLon(p.getNodeData().getX(),p.getNodeData().getY()));
+        }
+        returnList4.add(new Coordinate(lat2,lon2));
 
         List<List<Coordinate>> returnListAltnative = new ArrayList<List<Coordinate>>();
         returnListAltnative.add(returnList1);
         returnListAltnative.add(returnList2);
         returnListAltnative.add(returnList3);
+        returnListAltnative.add(returnList4);
         
         
         return returnListAltnative;
