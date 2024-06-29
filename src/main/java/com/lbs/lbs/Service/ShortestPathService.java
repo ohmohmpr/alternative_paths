@@ -223,7 +223,6 @@ public class ShortestPathService {
         
         // --> The longest shortest path
         AlternativePaths<Point2D, GeofabrikData> ALTpath4 = ALTpaths.get(ALTpaths.size() - 1);
-        System.out.println("ALTpaths.size() - 1 = " + (ALTpaths.size() - 1));
         List<DiGraph.DiGraphNode<Point2D, GeofabrikData>> path4 = ALTpath4.path;
         
         List<Coordinate> returnList4 = new ArrayList<>();

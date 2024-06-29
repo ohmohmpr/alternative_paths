@@ -26,4 +26,12 @@ public class AlternativePaths<V, E> {
     public double getdist() {
         return dist;
     }
+    
+    public double getdist_F() {
+        return dist_F;
+    }
+    
+    public double getdist_B() {
+        return dist_B;
+    }
 }
