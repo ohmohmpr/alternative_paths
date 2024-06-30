@@ -20,10 +20,6 @@
 	<!-- import OpenLayers -->
 	<script src="https://cdn.jsdelivr.net/npm/ol@v9.2.4/dist/ol.js"></script>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v9.2.4/ol.css">
-	
-<!-- 	<link rel="stylesheet" -->
-<!-- 		href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.9.0/css/ol.css" type="text/css"> -->
-<!-- 	<script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.9.0/build/ol.js"></script> -->
 
 	<!-- own script -->
 	<script src="js/script.js" defer></script>
@@ -126,12 +122,15 @@
 		function toggleForm() {
 			var form = document.getElementById("formSection");
 			form.style.display = form.style.display === "none" ? "block" : "none";
+			var form = document.getElementById("queries");
+			form.style.display = form.style.display === "block" ? "none" : "block";
 		}
 	</script>
 </head>
 
 <body>
-<!-- 	<div id="overlay" >Loading...</div> -->
+
+	<div id="overlay" >Loading...</div>
 	<div  class="wrapper">
 		<div class="box boxLeft">
 			<b style="font-family: Arial">
@@ -140,6 +139,18 @@
 				University of Bonn
 			</b>
 		</div>
+		<input class="input" id="alternateBtn" type="checkbox">
+		<label class="label" for="alternateBtn">
+			<div class="left">
+				Single Path
+			</div>
+			<div class="switch">
+				<span class="slider round"></span>
+			</div>
+			<div class="right">
+				Alternative Routes
+			</div>
+		</label>
 		<input class="input" id="toggleBtn" type="checkbox">
 		<label class="label" for="toggleBtn">
 			<div class="left">
@@ -152,12 +163,8 @@
 				Multi Modal Route
 			</div>
 		</label>
-
-
-	<!--	<div class="box boxRight">
-			<a href="#"> <img id="logo" src="https://www.geoinfo.uni-bonn.de/favicon.ico"></a>
-		</div>-->
 	</div>
+	
 	<div class="container">
 		<!-- this element will be filled with the map in 'js/main.js' -->
 		<div id="map" class="map"></div>
@@ -172,17 +179,24 @@
 					<input type="text" id="coord2">
 					<br>
 					<button type="button" onclick="findShortestPath()">Find Path</button>
-<!-- 					<button onclick="fetchData()">Fetch Data</button> -->
+				</form>
+			</div>
+			<div id="queries" style="display: none;">
+				<form>
+					<button id="query1" type="button" onclick="findShortestPath(7.0338828,50.7266336,7.1653508,50.6988795, this.id)">Query1</button>
+					<button id="query2" type="button" onclick="findShortestPath(7.0176772,50.6979819,7.1494490,50.7298374, this.id)">Query2</button>
+					<button id="query3" type="button" onclick="findShortestPath(7.0200068,50.7458053,7.0991104,50.7388231, this.id)">Query3</button>
+					<br>
+					<button id="query4" type="button" onclick="findShortestPath(7.0839525,50.7275752,7.0962870,50.7324448, this.id)">Query4</button>
+					<button id="query5" type="button" onclick="findShortestPath(7.0162592,50.7362101,7.1447899,50.7046795, this.id)">Query5</button>
+					<button id="query6" type="button" onclick="findShortestPath(7.0773341,50.7347230,7.1202789,50.7203698, this.id)">Query6</button>
+					<br>
+					<button id="query7" type="button" onclick="findShortestPath(7.1511709,50.7566288,7.0287173,50.7360044, this.id)">Query7</button>
+					<button id="query8" type="button" onclick="findShortestPath(7.0603182,50.6988795,7.1410424,50.6982383, this.id)">Query8</button>
+					<button id="query9" type="button" onclick="findShortestPath(7.0680159,50.7348969,7.1863168,50.7218896, this.id)">Query9</button>
 				</form>
 			</div>
 		</div>
-	</div>
-
-
-		</label>
-		<!--	<div class="box boxRight">
-                <a href="#"> <img id="logo" src="https://www.geoinfo.uni-bonn.de/favicon.ico"></a>
-            </div>-->
 	</div>
 
 </body>

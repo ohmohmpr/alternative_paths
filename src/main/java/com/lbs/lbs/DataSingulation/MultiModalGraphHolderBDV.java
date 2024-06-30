@@ -2,7 +2,7 @@ package com.lbs.lbs.DataSingulation;
 
 import com.lbs.lbs.Base.graph.types.RoadGraph;
 import com.lbs.lbs.Base.graph.types.multimodal.GeofabrikData;
-import com.lbs.lbs.Base.routing.MultiModalRouter;
+import com.lbs.lbs.Base.routing.MultiModalRouterBDV;
 import com.lbs.lbs.Base.routing.Router;
 import org.springframework.core.io.ClassPathResource;
 
@@ -10,7 +10,7 @@ import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.IOException;
 
-public class MultiModalGraphHolder {
+public class MultiModalGraphHolderBDV {
     static final String path;
 
     static {
@@ -21,10 +21,10 @@ public class MultiModalGraphHolder {
         }
     }
 
-    private MultiModalRouter<GeofabrikData, GeofabrikData> multiModalGraph;
-    private static MultiModalGraphHolder instance;
+    private MultiModalRouterBDV<GeofabrikData, GeofabrikData> multiModalGraphBDV;
+    private static MultiModalGraphHolderBDV instance;
 
-    public static MultiModalGraphHolder getInstance() throws Exception {
+    public static MultiModalGraphHolderBDV getInstance() throws Exception {
 
         if(instance == null){
             try {
@@ -35,16 +35,15 @@ public class MultiModalGraphHolder {
         }
         return instance;
     }
-    private static MultiModalGraphHolder getMultiModalGraphHolder() throws Exception {
+    private static MultiModalGraphHolderBDV getMultiModalGraphHolder() throws Exception {
         try{
 	        File gtfsDir = new File(path + "/gtfs/");
-	
-	
+
 	        RoadGraph<Point2D, GeofabrikData> roadGraph = RoadGraphHolder.getInstance().getRoadGraph();
 	
-	        MultiModalRouter<GeofabrikData, GeofabrikData> router = new MultiModalRouter<>(roadGraph, gtfsDir,
+	        MultiModalRouterBDV<GeofabrikData, GeofabrikData> router = new MultiModalRouterBDV<>(roadGraph, gtfsDir,
 	                Router.GEOFABRIK_FACTORY);
-	        MultiModalGraphHolder multiModalGraphHolder = new MultiModalGraphHolder();
+	        MultiModalGraphHolderBDV multiModalGraphHolder = new MultiModalGraphHolderBDV();
 	        multiModalGraphHolder.setMultiModalGraph(router);
 	        return multiModalGraphHolder;
         } catch (Exception e){
@@ -52,15 +51,15 @@ public class MultiModalGraphHolder {
         }
     }
 
-    public MultiModalRouter<GeofabrikData, GeofabrikData> getMultiModalGraph() {
-        return multiModalGraph;
+    public MultiModalRouterBDV<GeofabrikData, GeofabrikData> getMultiModalGraph() {
+        return multiModalGraphBDV;
     }
 
-    public static void setInstance(MultiModalGraphHolder instance) {
-        MultiModalGraphHolder.instance = instance;
+    public static void setInstance(MultiModalGraphHolderBDV instance) {
+        MultiModalGraphHolderBDV.instance = instance;
     }
 
-    public void setMultiModalGraph(MultiModalRouter<GeofabrikData, GeofabrikData> multiModalGraph) {
-        this.multiModalGraph = multiModalGraph;
+    public void setMultiModalGraph(MultiModalRouterBDV<GeofabrikData, GeofabrikData> multiModalGraphBDV) {
+        this.multiModalGraphBDV = multiModalGraphBDV;
     }
 }
