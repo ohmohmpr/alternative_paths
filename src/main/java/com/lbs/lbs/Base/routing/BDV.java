@@ -1,6 +1,7 @@
 package com.lbs.lbs.Base.routing;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -347,16 +348,34 @@ public class BDV<V, E extends WeightedArcData> {
 //		}
 //		id_dist_F_B.forEach((key, value) -> System.out.println(key + " " + value.dist));
 		
-		//limited sharing
+
+		ArrayList<AlternativePaths<V,E>> ls_alternativePaths = limitedSharing();
+		ArrayList<AlternativePaths<V,E>> answers = new ArrayList<AlternativePaths<V,E>>();
+
+		System.out.println("\n Show path");
+		ls_alternativePaths.sort(Comparator.comparing(a -> a.limited_sharing));
+		for (AlternativePaths<V, E> path : ls_alternativePaths) {
+			if (answers.size() < 4) {
+				System.out.println(path.dist + " " + path.commonNodeID + " " + path.limited_sharing);
+				answers.add(path);
+			}
+		}
+		
+		return answers;
+	}
+
+	
+	public ArrayList<AlternativePaths<V,E>> limitedSharing() {
+
 		ArrayList<AlternativePaths<V,E>> ls_alternativePaths = new ArrayList<AlternativePaths<V,E>>();
 		ls_alternativePaths.add(this.optimalShortestPath);
-
+	
 		double [] opt_dist = getoptdistArray();
 		int s = this.optimalShortestPath.path.size()-1;
 		System.out.println("opt_dist[last] = " + opt_dist[this.optimalShortestPath.path.get(s).getId()]);
 		System.out.println("opt_dist  = " + this.optimalShortestPathLength);
 		System.out.println("diff = " + (opt_dist[this.optimalShortestPath.path.get(s).getId()]- this.optimalShortestPathLength));
-
+	
 		int investigated_paths_c = 0;
 		for (AlternativePaths<V, E> path : alternativePaths) {
 			investigated_paths_c++;
@@ -364,7 +383,7 @@ public class BDV<V, E extends WeightedArcData> {
 			int same_node_counter = 0;
 			int prev_node_id = 0;
 			for (DiGraphNode<V, E> node: path.path) {
-
+	
 				if (opt_dist[node.getId()] != 0 ) {
 					if( same_node_counter == 0) {
 						prev_node_id = node.getId();
@@ -373,33 +392,21 @@ public class BDV<V, E extends WeightedArcData> {
 					if ( same_node_counter > 0) {
 						d = d + opt_dist[node.getId()] - opt_dist[prev_node_id];
 					}
-
+	
 				}else {
 					same_node_counter = 0;
 				}
-
+	
 			}
-			if (d < (gamma*this.optimalShortestPathLength)) {
-//				System.out.println("d: " + d);
+			if ( (d/this.optimalShortestPathLength) < gamma) {
+				path.limited_sharing = d / this.optimalShortestPathLength;
 				ls_alternativePaths.add(path);
 			}
-				
 		}
 		System.out.println("investigated paths " + investigated_paths_c);
 		System.out.println("admissable path " + ls_alternativePaths.size());
-
-		System.out.println("\nShow path");
-
-//		ls_alternativePaths.sort(Comparator.comparing(a -> a.dist));
-//		for (AlternativePaths<V, E> path : ls_alternativePaths) {
-//			double sum_dist = path.dist_F+ path.dist_B;
-//			System.out.println(path.dist + " "+ sum_dist + " "+ path.dist_F + " " + path.dist_B + " " + path.commonNodeID);
-//			
-//		}
-		
 		return ls_alternativePaths;
 	}
-
 	public double [] getoptdistArray() {
 		double optdist_F[] = new double[this.dist_F.length];
 		DiGraphNode<V, E> node_prv = null;
