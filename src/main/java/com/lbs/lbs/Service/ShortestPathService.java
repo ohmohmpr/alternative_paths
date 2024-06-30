@@ -209,8 +209,8 @@ public class ShortestPathService {
         }
         returnList2.add(new Coordinate(lat2,lon2));
         
-        // --> The between shortest and longest of shortest paths.
-        AlternativePaths<Point2D, GeofabrikData> ALTpath3 = ALTpaths.get((int) (ALTpaths.size()/2));
+        // --> The Third one.
+        AlternativePaths<Point2D, GeofabrikData> ALTpath3 = ALTpaths.get(2);
         List<DiGraph.DiGraphNode<Point2D, GeofabrikData>> path3 = ALTpath3.path;
         
         List<Coordinate> returnList3 = new ArrayList<>();
