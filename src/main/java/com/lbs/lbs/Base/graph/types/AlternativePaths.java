@@ -12,7 +12,9 @@ public class AlternativePaths<V, E> {
 	public double dist;
 	public double dist_F;
 	public double dist_B;
+	public double limited_sharing = 0;
 	public ArrayList<DiGraphNode<V, E>> path;
+	
 	// 3 properties: stretch, sharing, detour path;
 	
 	public AlternativePaths(int commonNodeID, double dist, double dist_F, double dist_B, List<DiGraphNode<V, E>> list) {
