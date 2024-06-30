@@ -408,12 +408,12 @@ public class BDV<V, E extends WeightedArcData> {
 				answers.add(path);
 			}
 		}
-		
+		/*
 		for (AlternativePaths<V, E> path : answers) {
 			System.out.println("\nNodeID,         Point(E, N),                                      weight");
 			path.printNodeAndWeight();
 			System.out.println("\n");
-		}
+		}*/
 		
 		return answers;
 	}
@@ -437,23 +437,26 @@ public class BDV<V, E extends WeightedArcData> {
 			int same_node_counter = 0;
 			int prev_node_id = 0;
 			for (DiGraphNode<V, E> node: path.path) {
-	
+
 				if (opt_dist[node.getId()] != 0 ) {
-					if( same_node_counter == 0) {
-						prev_node_id = node.getId();
-						same_node_counter++;
-					}
 					if ( same_node_counter > 0) {
 						d = d + opt_dist[node.getId()] - opt_dist[prev_node_id];
+					}
+					if( same_node_counter == 0) {
+						same_node_counter++;
 					}
 	
 				}else {
 					same_node_counter = 0;
 				}
-	
+				prev_node_id = node.getId();
 			}
+			/*System.out.println("this.optimalShortestPathLength = " +(this.optimalShortestPathLength));
+			System.out.println("d= " +d);
+			System.out.println("d/this.optimalShortestPathLength = " +(d/this.optimalShortestPathLength));*/
 			if ( (d/this.optimalShortestPathLength) < gamma) {
 				path.limited_sharing = d / this.optimalShortestPathLength;
+				//System.out.println("path.limited_sharing = " +path.limited_sharing);
 				ls_alternativePaths.add(path);
 			}
 		}
