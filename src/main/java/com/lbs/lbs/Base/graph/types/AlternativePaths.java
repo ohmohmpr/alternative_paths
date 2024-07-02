@@ -47,6 +47,10 @@ public class AlternativePaths<V, E> {
     public double getSizeweight() {
         return weights.size();
     }
+    
+    public double getCostFunction() {
+        return 2*dist + limited_sharing;
+    }
 
     public void printNodeAndWeight() {
     	
@@ -69,7 +73,7 @@ public class AlternativePaths<V, E> {
     
     public void print() {
     	
-    	System.out.println(dist+", "+commonNodeID+", "+limited_sharing+", "+weights.size());
+    	System.out.println(dist+", "+commonNodeID+", "+limited_sharing+", "+getCostFunction());
 
     }
     

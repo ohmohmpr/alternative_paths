@@ -441,8 +441,9 @@ public class BDV<V, E extends WeightedArcData> {
 		
 		// 4. Sort based on cost function, ADD
 		System.out.println("\nShow path");
-		System.out.println("\ndist,               NodeID, Limited Sharing, Size()");
-		ls_alternativePaths.sort(Comparator.comparing(a -> a.dist));
+		System.out.println("\ndist,               NodeID, Limited Sharing, Cost");
+		ls_alternativePaths.sort(Comparator.comparing(a -> a.getCostFunction()));
+//		answers.add(this.optimalShortestPath);
 		for (AlternativePaths<V, E> path : ls_alternativePaths) {
 			if (answers.size() < 4) {
 				path.print();
@@ -498,7 +499,7 @@ public class BDV<V, E extends WeightedArcData> {
 			}
 			// compare the optimalPathLength and the sharing path length to gamma
 			if ( (sigma/this.optimalShortestPathLength) < gamma) {
-				path.limited_sharing = sigma / this.optimalShortestPathLength;
+				path.limited_sharing = sigma;
 				//System.out.println("path.limited_sharing = " +path.limited_sharing);
 				ls_alternativePaths.add(path);
 			}
