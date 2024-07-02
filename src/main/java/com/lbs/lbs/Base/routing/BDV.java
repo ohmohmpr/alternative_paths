@@ -56,6 +56,10 @@ public class BDV<V, E extends WeightedArcData> {
 
 	//alternative path conditions
 	protected double gamma = 0.8;
+	protected double alpha = 0.25;
+
+	//alternative path result
+	protected ArrayList<AlternativePaths<V, E>> result = new ArrayList<AlternativePaths<V, E>>();
 
 	@SuppressWarnings("unchecked")
 	public BDV(DiGraph<V, E> g) {
@@ -170,7 +174,7 @@ public class BDV<V, E extends WeightedArcData> {
 				item_F = queue_F.getMin();
 				u_F = item_F.getValue();
 			}
-			
+
 
 			HeapItem<DiGraphNode<V, E>> item_B = queue_B.getMin();
 			DiGraphNode<V, E> u_B = item_B.getValue();
@@ -197,7 +201,7 @@ public class BDV<V, E extends WeightedArcData> {
 
 					weightOfArc = nit.getWeightOfCurrentArc(u_F, v);
 					discoverNode_F(u_F, v, queue_F, dist_F[u_F.getId()] + weightOfArc);
-					
+
 					// if the node got already investigated but not visited in the backward search -> new path
 					if (items_B[v.getId()] != null && visited_B[v.getId()]==false && visited_F[v.getId()]==false ) {
 						//System.out.println("u_F = "+ u_F.getId() + " v.getId()=" + v.getId());
@@ -206,16 +210,16 @@ public class BDV<V, E extends WeightedArcData> {
 						shortestPathLength = dist_F[u_id] + dist_B[v.getId()] + weightOfArc ;
 						List<DiGraphNode<V, E>> path_for_add = getPath();
 						List<Double> weight_for_add = getWeight();
-						
+
 						AlternativePaths<V, E> alternativePath = new AlternativePaths<>(commonNodeID, 
-										shortestPathLength,  dist_F[v.getId()]
+								shortestPathLength,  dist_F[v.getId()]
 										, dist_B[v.getId()], path_for_add, weight_for_add);
 
 						// check whether the path is the optimal path
 						if (optimalShortestPathLength > shortestPathLength) {
 							// check whether the optimal path is the first path
 							// if (optimalShortestPath != null) {
-								//alternativePaths.add(this.optimalShortestPath);
+							//alternativePaths.add(this.optimalShortestPath);
 							// }
 							optimalShortestPathLength = shortestPathLength;
 							this.dist_B_opt = dist_B;
@@ -225,9 +229,9 @@ public class BDV<V, E extends WeightedArcData> {
 						}// if it is not the optimal path just add it to the alternative paths
 						else {
 							singleViaPath(commonNodeID, alternativePath);
-//							alternativePaths.add(alternativePath);
+							//							alternativePaths.add(alternativePath);
 						}
-						
+
 					}
 				}
 			} // top_s > top_t -> Backward search
@@ -251,11 +255,11 @@ public class BDV<V, E extends WeightedArcData> {
 						// save the path
 						List<DiGraphNode<V, E>> path_for_add = getPath();
 						List<Double> weight_for_add = getWeight();
-						
+
 						AlternativePaths<V, E> alternativePath = new AlternativePaths<>(commonNodeID, 
 								shortestPathLength,  dist_F[v.getId()]
-								, dist_B[v.getId()], path_for_add, weight_for_add);
-						
+										, dist_B[v.getId()], path_for_add, weight_for_add);
+
 						// check whether the path is the optimal path 
 						if (optimalShortestPathLength > shortestPathLength) {
 							// check whether the optimal path is the first path
@@ -268,7 +272,7 @@ public class BDV<V, E extends WeightedArcData> {
 						}// if it is not the optimal path just add it to the alternative paths
 						else {
 							singleViaPath(commonNodeID, alternativePath);
-//							alternativePaths.add(alternativePath);
+							//							alternativePaths.add(alternativePath);
 						}
 					}
 				}
@@ -352,7 +356,7 @@ public class BDV<V, E extends WeightedArcData> {
 
 		return new ArrayList<DiGraphNode<V, E>>(path);
 	}
-	
+
 	public List<Double> getWeight() {
 		LinkedList<Double> weights = new LinkedList<Double>();
 
@@ -373,10 +377,10 @@ public class BDV<V, E extends WeightedArcData> {
 			} else {
 				weights.addFirst(0.0);
 			}
-			
+
 			current_F = pred_F[current_F.getId()];
 		}
-		
+
 		// add the nodes form the backward search
 		DiGraphNode<V, E> current_B = items_B[commonNodeID].getValue();
 		if (u_is_F == false){
@@ -390,7 +394,7 @@ public class BDV<V, E extends WeightedArcData> {
 				Double weight_B = dist_B[current_B.getId()] - dist_B[prev_node_B.getId()];
 				weights.addLast(weight_B);
 			} 
-			
+
 			current_B = pred_B[current_B.getId()];
 		}
 
@@ -398,7 +402,7 @@ public class BDV<V, E extends WeightedArcData> {
 	}
 
 	public void singleViaPath(int commonNodeID, AlternativePaths<V,E> alternativePath) {
-		
+
 		// Create a hash map, named id_dist_F_B, in which contains commonNodeID and alternativePath
 		// if commonNodeID is in the hash map, let compare
 		if (id_dist_F_B.containsKey(commonNodeID)) { //-> should not happen??
@@ -419,73 +423,90 @@ public class BDV<V, E extends WeightedArcData> {
 			alternativePaths.add(alternativePath);
 		}
 	}
-	
-	
+
+
 	public ArrayList<AlternativePaths<V, E>>  getPaths() {
 		alternativePaths.sort(Comparator.comparing(a -> a.dist));
-//		for (AlternativePaths<V, E> path : alternativePaths) {
-//				System.out.println(path.dist + " " + path.commonNodeID);
-//		}
-//		id_dist_F_B.forEach((key, value) -> System.out.println(key + " " + value.dist));
-		
-		
-		// BEGIN HERE
-		ArrayList<AlternativePaths<V,E>> answers = new ArrayList<AlternativePaths<V,E>>();
-		
-		
-		// 1. limitedSharing between the opt path and the rest ones. 
-		ArrayList<AlternativePaths<V,E>> ls_alternativePaths = limitedSharing();
+		//		for (AlternativePaths<V, E> path : alternativePaths) {
+		//				System.out.println(path.dist + " " + path.commonNodeID);
+		//		}
+		//		id_dist_F_B.forEach((key, value) -> System.out.println(key + " " + value.dist));
 
-		// 2. Local optimality.
-		// 3. Stretch.
-		
+
+		// BEGIN HERE
+		//ArrayList<AlternativePaths<V,E>> answers = new ArrayList<AlternativePaths<V,E>>();
+		result.add(optimalShortestPath);
+
+		while (result.size()<=2 && result.get(result.size()-1) != null) {
+			// 1. limitedSharing between the opt path and the rest ones.
+			// 2. Local optimality.	
+			AlternativePaths<V,E> ls_alternativePath = limitedSharing();
+
+
+			result.add(ls_alternativePath);
+			System.out.println("result: " + result.size());
+			// 3. Stretch.
+		}
 		// 4. Sort based on cost function, ADD
 		System.out.println("\nShow path");
 		System.out.println("\ndist,               NodeID, Limited Sharing, Size()");
-		ls_alternativePaths.sort(Comparator.comparing(a -> a.dist));
-		for (AlternativePaths<V, E> path : ls_alternativePaths) {
-			if (answers.size() < 4) {
-				path.print();
-				answers.add(path);
-			}
+		//ls_alternativePaths.sort(Comparator.comparing(a -> a.dist));
+		for (AlternativePaths<V, E> path :result) {
+
+			path.print();
+
+
 		}
-		
+
 		/*for (AlternativePaths<V, E> path : answers) {
 			System.out.println("\nNodeID,         Point(E, N),                                      weight");
 			path.printNodeAndWeight();
 			System.out.println("\n");
 		}*/
-		
-		return answers;
+
+		return result;
 	}
 
-	
-	public ArrayList<AlternativePaths<V,E>> limitedSharing() {
 
-		ArrayList<AlternativePaths<V,E>> ls_alternativePaths = new ArrayList<AlternativePaths<V,E>>();
-		ls_alternativePaths.add(this.optimalShortestPath);
-	
+	public AlternativePaths<V,E> limitedSharing() {
+
+		AlternativePaths<V,E> ls_alternativePath = null;
+
 		double [] opt_dist = getoptdistArray();
 		int s = this.optimalShortestPath.path.size()-1;
 		System.out.println("opt_dist[last] = " + opt_dist[this.optimalShortestPath.path.get(s).getId()]);
 		System.out.println("opt_dist  = " + this.optimalShortestPathLength);
 		System.out.println("diff = " + (opt_dist[this.optimalShortestPath.path.get(s).getId()]- this.optimalShortestPathLength));
-	
+		int condition = 0;
+		double T = this.alpha* this.optimalShortestPathLength;
 		int investigated_paths_c = 0;
-		for (AlternativePaths<V, E> path : alternativePaths) {
+		while(condition < 2 && alternativePaths.size()>0) {
+			//System.out.println("alternativePaths.size() = " + alternativePaths.size());
+			//for (AlternativePaths<V, E> path : alternativePaths) {
 			//initialize for each path:
+			AlternativePaths<V, E> path = alternativePaths.get(0);
+			alternativePaths.remove(0);
+			condition = 0;
 			investigated_paths_c++;
 			double sigma = 0;
 			int same_node_counter = 0;
 			int prev_node_id = 0;
+			int c  = 0;
+			boolean c_b = true;
 			for (DiGraphNode<V, E> node: path.path) {
+				// find the common node in the list
+				if (node.getId() != path.commonNodeID && c_b) {
+					c++;
+				}else {
+					c_b = false;
+				}
 				// if the current node is in the optimal path
 				if (opt_dist[node.getId()] != 0 ) {
 					//if also the previous node is in the optimal path
 					if ( same_node_counter > 0) {
 						// add the distance between current and previous node to sigma
 						sigma = sigma + opt_dist[node.getId()] - opt_dist[prev_node_id];
-						
+
 					}//if also the previous node is not in the optimal path just add the counter
 					else {
 						same_node_counter++;
@@ -498,37 +519,100 @@ public class BDV<V, E extends WeightedArcData> {
 			}
 			// compare the optimalPathLength and the sharing path length to gamma
 			if ( (sigma/this.optimalShortestPathLength) < gamma) {
+
+				//test locally optimal
+				condition++;
 				path.limited_sharing = sigma / this.optimalShortestPathLength;
-				//System.out.println("path.limited_sharing = " +path.limited_sharing);
-				ls_alternativePaths.add(path);
+				//System.out.println("test locally optimal ");
+				//T-Test:
+				/*search the node x -> node which is at least T away but closest to the common node(v)
+				in the s-v subpath */
+				boolean loc_opt = true;
+				double t1 = 0;
+				int i = 1;
+				double c_dist_F = dist_F[path.path.get(c).getId()];
+				DiGraphNode<V, E> x = path.path.get(c-i);
+				DiGraphNode<V, E> x_ = pred_F[path.commonNodeID];
+
+				//System.out.println("path.path.get(c).getId() =  " + path.path.get(c).getId());
+				//System.out.println("path.commonNodeID =  " + path.commonNodeID);
+				while(t1 < T && i < c ) {
+					x = path.path.get(c-i);
+					t1 = c_dist_F - dist_F[x.getId()];
+					if (x!=x_) {
+						loc_opt = false;
+						System.out.println("path is not locally optimal ");
+						/*System.out.println("i  = " + i + " ,x = " + x.getId());
+						System.out.println("x_ = " + x_.getId());*/
+						break;
+					}
+					i++;
+					x_ = pred_F[x.getId()];
+
+				}if (loc_opt == true) {
+					/*search the node y -> node which is at least T away but closest to the common node(v)
+				in the v-t subpath */
+					double t2 = 0;
+					int j = 1;
+					DiGraphNode<V, E> y = path.path.get(c+j);
+					DiGraphNode<V, E> y_ = pred_B[path.commonNodeID];
+
+					double c_dist_B = dist_B[path.path.get(c).getId()];
+					while(t2 < T && (j+ c) < path.path.size()-1) {
+						t2 = c_dist_B - dist_B[path.path.get(c+j).getId()];
+						y = path.path.get(c+j);
+						if (y!=y_) {
+							loc_opt = false;
+							System.out.println("path is not locally optimal ");
+							//System.out.println("j  = " + j + " ,y = " + y.getId());
+							//System.out.println("y_ = " + y_.getId());
+							break;
+						}
+						j++;
+						y_ = pred_B[y.getId()];
+					}
+				}if (loc_opt == true) {
+					condition++;
+					//System.out.println("locally optimal ");
+					ls_alternativePath  = path;
+					System.out.println("found path which is limiting sharing and locally optimal ");
+				}
+
 			}
+
 		}
+		//System.out.println("path.limited_sharing = " +path.limited_sharing);
+
+
+
 		System.out.println("investigated paths " + investigated_paths_c);
-		System.out.println("admissable path " + ls_alternativePaths.size());
-		return ls_alternativePaths;
+		return ls_alternativePath;
 	}
+
 	public double [] getoptdistArray() {
 		//initialize:
 		double optdist_F[] = new double[this.dist_F.length];
-		DiGraphNode<V, E> node_prv = null;
-		boolean F = true;
-		boolean start=true;
-		for (DiGraphNode<V, E> node: this.optimalShortestPath.path) {
-			//for the first node: the distance can be 0.0 -> no criteria to go to the backward search
-			if (start){
-				optdist_F[node.getId()] = this.dist_F[node.getId()];	
-				node_prv = node;
-				start = false;
-			} else {
-				//add the distances of the forward search 
-				if (this.dist_F[node.getId()] != 0.0 && F) {
+		for (AlternativePaths<V, E> path : result) {
+			DiGraphNode<V, E> node_prv = null;
+			boolean F = true;
+			boolean start=true;
+			for (DiGraphNode<V, E> node: path.path) {
+				//for the first node: the distance can be 0.0 -> no criteria to go to the backward search
+				if (start){
 					optdist_F[node.getId()] = this.dist_F[node.getId()];	
 					node_prv = node;
+					start = false;
 				} else {
-					//compute the distances of the backward search as distances form start node to current node 
-					F = false;
-					optdist_F[node.getId()] = optdist_F[node_prv.getId()] + this.dist_B[node_prv.getId()] - this.dist_B[node.getId()];
-					node_prv = node;
+					//add the distances of the forward search 
+					if (this.dist_F[node.getId()] != 0.0 && F) {
+						optdist_F[node.getId()] = this.dist_F[node.getId()];	
+						node_prv = node;
+					} else {
+						//compute the distances of the backward search as distances form start node to current node 
+						F = false;
+						optdist_F[node.getId()] = optdist_F[node_prv.getId()] + this.dist_B[node_prv.getId()] - this.dist_B[node.getId()];
+						node_prv = node;
+					}
 				}
 			}
 		}
@@ -694,9 +778,9 @@ public class BDV<V, E extends WeightedArcData> {
 		}
 	}
 
-		/**
-		 * NodeIterator that depends only on the graph structure.
-		 */
-		protected NodeIterator<V, E> DEFAULT_ADJACENT_NODE_ITERATOR = new BasicAdjacentNodeIterator<V, E>(null);
+	/**
+	 * NodeIterator that depends only on the graph structure.
+	 */
+	protected NodeIterator<V, E> DEFAULT_ADJACENT_NODE_ITERATOR = new BasicAdjacentNodeIterator<V, E>(null);
 
-	}
+}
