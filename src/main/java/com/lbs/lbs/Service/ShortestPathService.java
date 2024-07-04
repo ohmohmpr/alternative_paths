@@ -153,7 +153,8 @@ public class ShortestPathService {
 //    }
     
 
-    public static List<List<Coordinate>>  getAlternativeRoutesBDV(double lat1,double lon1,double lat2, double lon2) throws Exception {
+    public static List<List<Coordinate>>  getAlternativeRoutesBDV(double lat1,double lon1,double lat2, double lon2, 
+    		int numPaths, double limSharing, double localOpt, double UBS) throws Exception {
 
         Coordinate source = LatLon2EN(lat1, lon1);
         Coordinate target = LatLon2EN(lat2, lon2);
@@ -162,7 +163,7 @@ public class ShortestPathService {
         DiGraph.DiGraphNode<Point2D, GeofabrikData> sourceNode = graphHolder.findNearestPoint(source);
         DiGraph.DiGraphNode<Point2D, GeofabrikData> targetNode = graphHolder.findNearestPoint(target);
 
-        BDV<Point2D, GeofabrikData> dj = new BDV<Point2D, GeofabrikData>(graphHolder.getRoadGraph());
+        BDV<Point2D, GeofabrikData> dj = new BDV<Point2D, GeofabrikData>(graphHolder.getRoadGraph(), numPaths, limSharing, localOpt, UBS);
         
         dj.run(sourceNode,targetNode);
 

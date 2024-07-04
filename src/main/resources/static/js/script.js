@@ -98,6 +98,10 @@ SECOND_MARKER.setStyle(SECOND_MARKER_ICON);
 /***** INPUT ELEMENTS *****/
 const firstCoordInput = document.getElementById("coord1");
 const secondCoordInput = document.getElementById("coord2");
+var numPaths = 3;
+var limitedSharing = 0.80;
+var localOptimality = 0.25;
+var UBS = 0.25;
 /**** -------- *****/
 
 
@@ -275,6 +279,9 @@ MAP.on("click", function (e) {
 /**** METHODS ******/
 async function findShortestPath(lon1=null, lat1=null, lon2=null, lat2=null, id=null) {
 
+    let startTime = performance.now();
+      
+	validateBDV();
     clearOldLayers();
     if (lon1 === null && lat1 === null && lon2 === null && lat2 === null){
 	    [lon1, lat1] = [parseFloat(firstCoordInput.value.split(",")[0]), parseFloat(firstCoordInput.value.split(",")[1])];
@@ -287,8 +294,16 @@ async function findShortestPath(lon1=null, lat1=null, lon2=null, lat2=null, id=n
 		clearLayer(secondMarkerLayer);
 	}
 
-    let url = `${BASE_URL}/${GROUP_NAME}/ex1/${pathMethod}-${routeMethod}?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
+	if (pathMethod === "alternativepath") {
+	   url = `${BASE_URL}/${GROUP_NAME}/ex1/${pathMethod}-${routeMethod}?`+
+	   		`lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`+
+	   		`&numPaths=${numPaths}&limitedSharing=${limitedSharing}`+
+	   		`&localOptimality=${localOptimality}&UBS=${UBS}`;
+	} else {
+	   url = `${BASE_URL}/${GROUP_NAME}/ex1/${pathMethod}-${routeMethod}?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
+	}
 
+	console.log(url);
     document.getElementById("overlay").style.display = "flex";
     const res = await fetch(url);
     const data = await res.json();
@@ -316,12 +331,47 @@ async function findShortestPath(lon1=null, lat1=null, lon2=null, lat2=null, id=n
 
 	plot_markers(lon1, lat1, lon2, lat2);
 	changeColor(id);
-        
+	
+    document.getElementById("center").style.display = "block";
     document.getElementById("overlay").style.display = "none";
+    
+	let endTime = performance.now();
+	let timeElapsed = endTime - startTime;
+	showResults(pathMethod, data, timeElapsed/1000);
+
 }
 /************* --------------------- *************/
 
 /**** UTILS ******/
+function showResults(pathMethod, data, timeElapsed) {
+	var rst = document.getElementById('center');
+	
+	rst.innerHTML = "";
+	if (pathMethod === "singlepath") {
+		var numberPaths = 1;
+		rst.innerHTML += 
+				`<p> <b>${numberPaths}</b> path has been found.</p>\
+				<p> Time used: <b>${timeElapsed.toFixed(3)}</b> seconds.</p>\
+				<br>`;
+	}
+	else {
+		var numberPaths = data.length;
+		rst.innerHTML += 
+				`<p> <b>${numberPaths}</b> paths have been found.</p>\
+				<p> Time used: <b>${timeElapsed.toFixed(3)}</b> seconds.</p>\
+				<br>`;
+		for (let i = 0; i < numberPaths; i++) {
+			rst.innerHTML += 
+				`<p> <b>${numberPaths}</b> paths have been found.</p>\
+				<p> Time used: <b>${timeElapsed.toFixed(3)}</b> seconds.</p>\
+				<br>`;
+		}
+	}
+
+
+
+}
+
 function plot_markers(lon1, lat1, lon2, lat2) {
 	
     MAP.setView(new ol.View({
@@ -359,6 +409,41 @@ function changeColor(id) {
 
 }
 
+function validateBDV() {
+
+	if (document.getElementById("numPaths").value == "") {
+		document.getElementById("numPaths").value = 3;
+	}
+	numPaths = document.getElementById("numPaths").value;
+	
+	if (document.getElementById("limitedSharing").value == "") {
+		document.getElementById("limitedSharing").value = 0.8;
+	}
+	limitedSharing = document.getElementById("limitedSharing").value;
+	
+	if (document.getElementById("localOptimality").value == "") {
+		document.getElementById("localOptimality").value = 0.25;
+	}
+	localOptimality = document.getElementById("localOptimality").value;
+	
+	if (document.getElementById("UBS").value == "") {
+		document.getElementById("UBS").value = 0.25;
+	}
+	UBS = document.getElementById("UBS").value;
+ }
+
+function checkNumber(id, min=0, max=1) {
+	  let number = document.getElementById(id).value;
+	  if (number>max || number<min)
+		  document.getElementById(id).value = "";
+}
+
+function toggleResult() {
+	var form = document.getElementById("center");
+	form.style.display = form.style.display === "block" ? "none" : "block";
+	var legend = document.getElementById("legend");
+	legend.style.display = form.style.display === "none" ? "block" : "none";
+}
 /************* --------------------- *************/
 
 

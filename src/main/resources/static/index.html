@@ -90,7 +90,7 @@
 		.buttons button {
 			cursor: pointer;
 			border-radius: 6px;
-			padding: 8px 16px;
+/* 			padding: 8px 16px; */
 		}
 
 		#formSection form {
@@ -114,6 +114,31 @@
 	      color: white;
 	      font-size: 2em;
 	    }
+	    
+		#center {
+		  display: none;
+		  position: absolute;
+		  width: 40%;
+		  height: 60%;
+		  z-index: 15;
+		  top: 20%;
+		  left: 50%;
+		  margin: -100px 0 0 -300px;
+/* 		  background: rgba(0, 78, 159, 0.3); */
+		  background:rgba(255,255,255, 0.4);
+		}
+	    
+		#legend {
+		  display: none;
+		  position: absolute;
+		  width: 10%;
+		  height: 10%;
+		  z-index: 15;
+		  top: 10%;
+		  left: 23%;
+		  margin: -60px 0 0 -300px;
+		  background:rgba(255,255,255, 0.4);
+		}
 		
 
 	</style>
@@ -123,6 +148,10 @@
 			var form = document.getElementById("formSection");
 			form.style.display = form.style.display === "none" ? "block" : "none";
 			var form = document.getElementById("queries");
+			form.style.display = form.style.display === "block" ? "none" : "block";
+		}
+		function toggleOption() {
+			var form = document.getElementById("option");
 			form.style.display = form.style.display === "block" ? "none" : "block";
 		}
 	</script>
@@ -167,17 +196,28 @@
 	
 	<div class="container">
 		<!-- this element will be filled with the map in 'js/main.js' -->
-		<div id="map" class="map"></div>
+		<div id="map" class="map">
+	    	<div id="legend">
+
+	    	</div>
+	    	<div id="center">
+	    	</div>
+		</div>
+
 		<div class="buttons">
-			<button onclick="toggleForm()">Navigate</button>
+			<div>
+				<button onclick="toggleResult()">Result</button>
+				<button onclick="toggleForm()">Navigate</button>
+				<button onclick="toggleOption()">Option</button>
+			</div>
+
 			<div id="formSection" style="display: block;">
 				<form>
 					<label for="coord1">Starting Location:</label>
 					<input type="text" id="coord1">
-					<br>
 					<label for="coord2">Destination:</label>
 					<input type="text" id="coord2">
-					<br>
+<!-- 					<br> -->
 					<button type="button" onclick="findShortestPath()">Find Path</button>
 				</form>
 			</div>
@@ -194,6 +234,26 @@
 					<button id="query7" type="button" onclick="findShortestPath(7.1511709,50.7566288,7.0287173,50.7360044, this.id)">Query7</button>
 					<button id="query8" type="button" onclick="findShortestPath(7.0603182,50.6988795,7.1410424,50.6982383, this.id)">Query8</button>
 					<button id="query9" type="button" onclick="findShortestPath(7.0680159,50.7348969,7.1863168,50.7218896, this.id)">Query9</button>
+				</form>
+			</div>
+			<div id="option" style="display: none;">
+				<form>
+					<div>
+						<label for="Number of Paths">Number of Paths:</label>
+						<input type="number" id="numPaths" value="3" placeholder="3" min="1" max="5" step="1" oninput="checkNumber(id, min=1, max=5)">
+					</div>
+					<div>
+						<label for="limitedSharing">Limited Sharing:</label>
+						<input type="number" id="limitedSharing" value="0.8" placeholder="0.8" min="0" max="1" step="0.01" oninput="checkNumber(id)">
+					</div>
+					<div>
+						<label for="localOptimality">Local Optimality:</label>
+						<input type="number" id="localOptimality" value="0.25" placeholder="0.25" min="0" max="1" step="0.01" oninput="checkNumber(id)">
+					</div>
+					<div>
+						<label for="UBS">UBS:</label>
+						<input type="number" id="UBS" value="0.25" placeholder="0.25" min="0" max="1" step="0.01" oninput="checkNumber(id)">
+					</div>
 				</form>
 			</div>
 		</div>

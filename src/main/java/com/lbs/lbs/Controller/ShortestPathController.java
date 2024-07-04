@@ -113,31 +113,16 @@ public class ShortestPathController {
 //    }
 
     @GetMapping("/alternativepath-shortestpathbidi")
-    public ResponseEntity<List<List<TransportPath>>> simpleShortestPathBDVController(@RequestParam double lat1,@RequestParam double lon1,@RequestParam double lat2,@RequestParam double lon2){
+    public ResponseEntity<List<List<TransportPath>>> simpleShortestPathBDVController(@RequestParam double lat1,@RequestParam double lon1,
+    		@RequestParam double lat2,@RequestParam double lon2,
+    		@RequestParam int numPaths,@RequestParam double limitedSharing,
+    		@RequestParam double localOptimality,@RequestParam double UBS){
         /**
          * This Function's inputs are latitude and longitude, represents source and target locations
          * returns list of the shortest path coordinates as latitude and longitude*/
 
         try {
-            List<List<Coordinate>> alt = ShortestPathService.getAlternativeRoutesBDV(lat1, lon1, lat2, lon2);
-            
-            //debug that the results are not the same.
-//            try {
-//                int c = 0;
-//                for (List<Coordinate> l:alt) {
-//                	FileWriter myWriter = new FileWriter("alternativepath-shortestpathbidi" + c +".txt");
-//                	for (Coordinate cor:l) {
-//                		String x = String.valueOf(cor.x);
-//                		String y = String.valueOf(cor.y);
-//                		myWriter.write(x+", "+y+"\n");
-//                	}
-//                	myWriter.close();
-//                } 
-//                System.out.println("Successfully wrote to the file.");
-//              } catch (IOException e) {
-//                System.out.println("An error occurred.");
-//                e.printStackTrace();
-//            }
+            List<List<Coordinate>> alt = ShortestPathService.getAlternativeRoutesBDV(lat1, lon1, lat2, lon2, numPaths, limitedSharing, localOptimality, UBS);
             
             System.out.println(alt.size());
 			System.out.println("\n");

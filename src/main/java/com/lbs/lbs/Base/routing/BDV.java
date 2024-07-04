@@ -49,16 +49,17 @@ public class BDV<V, E extends WeightedArcData> {
 	// BD variables
 	protected double optimalShortestPathLength = Double.MAX_VALUE;
 	protected AlternativePaths<V, E> optimalShortestPath = null;
-	protected double epsilon = 0.25; // stretch longest admissible path can be.
-	protected int p = 3; // number of alternative paths.
 	public ArrayList<AlternativePaths<V, E>> alternativePaths;
 	public Map<Integer, AlternativePaths<V,E>> id_dist_F_B;
 
 	//alternative path conditions
+	protected int numPaths = 3; // number of alternative paths.
+	protected double epsilon = 0.25; // stretch longest admissible path can be.
 	protected double gamma = 0.8;
-
+	protected double alpha = 0.25;
+	
 	@SuppressWarnings("unchecked")
-	public BDV(DiGraph<V, E> g) {
+	public BDV(DiGraph<V, E> g, int numPaths, double limSharing, double localOpt, double UBS) {
 		this.dist_F = new double[g.n()];
 		this.dist_F_opt = new double[g.n()];
 		this.stamps_F = new int[g.n()];
@@ -72,6 +73,11 @@ public class BDV<V, E extends WeightedArcData> {
 		this.visited_B = new boolean[g.n()];
 		this.items_B = new HeapItem[g.n()];
 		this.pred_B = new DiGraphNode[g.n()];
+		
+		this.numPaths = numPaths;
+		this.epsilon = UBS;
+		this.gamma = limSharing;
+		this.alpha = localOpt;
 
 		this.alternativePaths = new ArrayList<AlternativePaths<V,E>>();
 		this.id_dist_F_B = new HashMap<Integer, AlternativePaths<V,E>>();
