@@ -8,6 +8,7 @@ import java.util.List;
 import com.lbs.lbs.Base.graph.DiGraph;
 import com.lbs.lbs.Base.graph.DiGraph.DiGraphArc;
 import com.lbs.lbs.Base.graph.DiGraph.DiGraphNode;
+import com.lbs.lbs.Base.graph.types.AlternativePaths;
 import com.lbs.lbs.Base.graph.types.WeightedArcData;
 import com.lbs.lbs.Base.util.MinHeap;
 import com.lbs.lbs.Base.util.MinHeap.HeapItem;
@@ -151,12 +152,11 @@ public class BiDijkstra<V, E extends WeightedArcData> {
 					weightOfArc = nit.getWeightOfCurrentArc(u_F, v);
 					discoverNode_F(u_F, v, queue_F, dist_F[u_F.getId()] + weightOfArc);
 					
-					if (items_B[v.getId()] != null && shortestPathLength > dist_F[u_F.getId()] + dist_B[u_B.getId()]) {
+					int nodeID = v.getId();
+					double currentLength =  dist_F[nodeID] + dist_B[nodeID];
+					if (items_B[v.getId()] != null && shortestPathLength > currentLength) {
 						commonNodeID = v.getId();
-						System.out.println("Foreward");
-						System.out.println("commonNodeID " + commonNodeID);
-						
-						shortestPathLength = dist_F[u_F.getId()] + dist_B[u_B.getId()];
+						shortestPathLength = currentLength;
 					}
 				}
 			} else {
@@ -167,12 +167,11 @@ public class BiDijkstra<V, E extends WeightedArcData> {
 					weightOfArc = nit.getWeightOfCurrentArc(u_B, v);
 					discoverNode_B(u_B, v, queue_B, dist_B[u_B.getId()] + weightOfArc);
 
-	 				if (items_F[v.getId()] != null && shortestPathLength > dist_F[u_F.getId()] + dist_B[u_B.getId()]) {
+					int nodeID = v.getId();
+					double currentLength =  dist_F[nodeID] + dist_B[nodeID];
+	 				if (items_F[v.getId()] != null && shortestPathLength > currentLength) {
 						commonNodeID = v.getId();
-						System.out.println("Backward");
-						System.out.println("commonNodeID " + commonNodeID);
-						
-						shortestPathLength = dist_F[u_F.getId()] + dist_B[u_B.getId()];
+						shortestPathLength = currentLength;
 					}
 				}
 			}
@@ -256,28 +255,46 @@ public class BiDijkstra<V, E extends WeightedArcData> {
 		return new ArrayList<DiGraphNode<V, E>>(path);
 	}
 
-//	public List<DiGraphArc<V, E>> getPathArcs(DiGraphNode<V, E> target) {
-//		LinkedList<DiGraphArc<V, E>> path = new LinkedList<DiGraphArc<V, E>>();
-//
-//		if (stamps[target.getId()] < currentStamp) {
-//			return new ArrayList<DiGraphArc<V, E>>();
-//		}
-//
-//		DiGraphNode<V, E> prev = null;
-//		DiGraphNode<V, E> current = target;
-//		while (current != null) {
-//			if (prev == null) {
-//				prev = current;
-//				current = pred[prev.getId()];
-//				continue;
-//			}
-//			path.addFirst(current.getFirstOutgoingArcTo(prev));
-//			prev = current;
-//			current = pred[prev.getId()];
-//		}
-//
-//		return new ArrayList<DiGraphArc<V, E>>(path);
-//	}
+	public List<DiGraphArc<V, E>> getPathArcs() {
+		DiGraphNode<V, E> target = items_F[commonNodeID].getValue();
+		LinkedList<DiGraphArc<V, E>> path = new LinkedList<DiGraphArc<V, E>>();
+
+		if (stamps_F[target.getId()] < currentStamp) {
+			return new ArrayList<DiGraphArc<V, E>>();
+		}
+
+		DiGraphNode<V, E> prev = null;
+		DiGraphNode<V, E> current = target;
+		while (current != null) {
+			if (prev == null) {
+				prev = current;
+				current = pred_F[prev.getId()];
+				continue;
+			}
+			path.addFirst(current.getFirstOutgoingArcTo(prev));
+			prev = current;
+			current = pred_F[prev.getId()];
+		}
+
+		if (stamps_B[target.getId()] < currentStamp) {
+			return new ArrayList<DiGraphArc<V, E>>();
+		}
+
+		DiGraphNode<V, E> prev_B = null;
+		DiGraphNode<V, E> current_B = target;
+		while (current_B != null) {
+			if (prev_B == null) {
+				prev_B = current_B;
+				current_B = pred_B[prev_B.getId()];
+				continue;
+			}
+			path.addLast(current_B.getFirstOutgoingArcTo(prev_B));
+			prev_B = current_B;
+			current_B = pred_B[prev_B.getId()];
+		}
+		
+		return new ArrayList<DiGraphArc<V, E>>(path);
+	}
 
 	/**
 	 * Assumes that the dijkstra has been executed before. Returns the distance of
