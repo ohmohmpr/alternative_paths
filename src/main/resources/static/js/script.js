@@ -280,7 +280,7 @@ MAP.on("click", function (e) {
 async function findShortestPath(lon1=null, lat1=null, lon2=null, lat2=null, id=null) {
 
     let startTime = performance.now();
-      
+
 	validateBDV();
     clearOldLayers();
     if (lon1 === null && lat1 === null && lon2 === null && lat2 === null){
@@ -317,7 +317,7 @@ async function findShortestPath(lon1=null, lat1=null, lon2=null, lat2=null, id=n
         drawMultiModalPath(data)
     } else if (routeMethod !== "multimodalroute" && pathMethod === "alternativepath") {
         clearOldLayers();
-        colorCode = ["#0080ff", "#FF0000", "#008000", "#ffA500"];
+        colorCode = ["#0080ff", "#FF0000", "#008000", "#ffA500", "#800080"];
         i_c = 0;
         data.forEach(pathData =>  {
 			drawPath(pathData,colorCode[i_c%colorCode.length])
