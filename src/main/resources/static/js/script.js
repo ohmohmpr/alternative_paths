@@ -68,8 +68,8 @@ const MAX_Y = RIGHT_TOP[1];
 const FIRST_MARKER_ICON = new ol.style.Style({
     image: new ol.style.Icon({
         crossOrigin: 'anonymous',
-        src: 'https://cdn1.iconfinder.com/data/icons/web-55/32/web_1-1024.png',
-        scale: "0.03"
+        src: 'https://cdn0.iconfinder.com/data/icons/digital-marketing-2-22/48/62-1024.png',
+        scale: "0.032"
     }),
 });
 
