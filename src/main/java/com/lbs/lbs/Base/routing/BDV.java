@@ -444,10 +444,11 @@ public class BDV<V, E extends WeightedArcData> {
 		
 		double T_F = this.alpha * this.optimalLength;
 		double length_x = 0;
-		
+
 		DiGraphNode<Point2D, GeofabrikData> NODE_X = null;
+		DiGraphNode<V, E> viaNode_F = null;
 		while (index_viaNode_F != 0 && T_F > 0) {
-			DiGraphNode<V, E> viaNode_F = nodes_F.get(index_viaNode_F);
+			viaNode_F = nodes_F.get(index_viaNode_F);
 			index_viaNode_F = index_viaNode_F - 1;
 			DiGraphNode<V, E> predNode_F = nodes_F.get(index_viaNode_F);
 
@@ -458,8 +459,8 @@ public class BDV<V, E extends WeightedArcData> {
 
 			NODE_X = (DiGraphNode<Point2D, GeofabrikData>) viaNode_F;
 			viaNode_F = predNode_F;
+			System.out.println("NODE_X: " + NODE_X);
 		}
-
 
 		int index_viaNode_B = 0;
 
@@ -467,8 +468,9 @@ public class BDV<V, E extends WeightedArcData> {
 		double length_y = 0;
 
 		DiGraphNode<Point2D, GeofabrikData> NODE_Y = null;
+		DiGraphNode<V, E> viaNode_B = null;
 		while (index_viaNode_B != nodes_B.size() - 1 && T_B > 0) {
-			DiGraphNode<V, E> viaNode_B = nodes_B.get(index_viaNode_B);
+			viaNode_B = nodes_B.get(index_viaNode_B);
 			index_viaNode_B = index_viaNode_B + 1;
 			DiGraphNode<V, E> predNode_B = nodes_B.get(index_viaNode_B);
 
@@ -481,8 +483,13 @@ public class BDV<V, E extends WeightedArcData> {
 			viaNode_B = predNode_B;
 		}
 
-        double dj_length_x = this.dj.run(NODE_X,viaNode);
-        double dj_length_y = this.dj.run(viaNode,NODE_Y);
+		if (NODE_X == null || NODE_X == null || viaNode_F == null || viaNode_B == null ) {		
+			path.passLocalOptimality = true;
+			return path.passLocalOptimality;
+		}
+
+		double dj_length_x = this.dj.run(NODE_X,viaNode);
+		double dj_length_y = this.dj.run(viaNode,NODE_Y);	
 
         if (Math.abs(dj_length_x - length_x) < 1e-6 && 
         		Math.abs(dj_length_y - length_y) < 1e-6 ) {
