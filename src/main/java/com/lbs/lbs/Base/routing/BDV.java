@@ -484,7 +484,7 @@ public class BDV<V, E extends WeightedArcData> {
 		}
 
 		if (NODE_X == null || NODE_X == null || viaNode_F == null || viaNode_B == null ) {		
-			path.passLocalOptimality = true;
+			path.passLocalOptimality = false;
 			return path.passLocalOptimality;
 		}
 
