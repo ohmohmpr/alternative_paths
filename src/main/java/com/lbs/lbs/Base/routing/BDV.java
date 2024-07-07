@@ -459,7 +459,6 @@ public class BDV<V, E extends WeightedArcData> {
 
 			NODE_X = (DiGraphNode<Point2D, GeofabrikData>) viaNode_F;
 			viaNode_F = predNode_F;
-			System.out.println("NODE_X: " + NODE_X);
 		}
 
 		int index_viaNode_B = 0;
