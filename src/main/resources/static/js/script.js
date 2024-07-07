@@ -146,6 +146,8 @@ let secondMarkerLayer;
 let routeMethod = "shortestpathbidi"; // shortestpath, shortestpathbidi
 let pathMethod = "singlepath";
 let ptCount = 0;
+let colorCode = ["#0080ff", "#FF0000", "#008000", "#ffA500", "#800080"];
+// blue, green, red, orange, purple.
 /**** -------- *****/
 
 
@@ -303,12 +305,10 @@ async function findShortestPath(lon1=null, lat1=null, lon2=null, lat2=null, id=n
 	   url = `${BASE_URL}/${GROUP_NAME}/ex1/${pathMethod}-${routeMethod}?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
 	}
 
-	console.log(url);
     document.getElementById("overlay").style.display = "flex";
     const res = await fetch(url);
     const data = await res.json();
-    
-    console.log(data)
+
 
     if (routeMethod !== "multimodalroute" && pathMethod === "singlepath") {
         drawPath(data);
@@ -317,10 +317,9 @@ async function findShortestPath(lon1=null, lat1=null, lon2=null, lat2=null, id=n
         drawMultiModalPath(data)
     } else if (routeMethod !== "multimodalroute" && pathMethod === "alternativepath") {
         clearOldLayers();
-        colorCode = ["#0080ff", "#FF0000", "#008000", "#ffA500", "#800080"];
         i_c = 0;
         data.forEach(pathData =>  {
-			drawPath(pathData,colorCode[i_c%colorCode.length])
+			drawPath(pathData.right,colorCode[i_c%colorCode.length])
 			i_c = i_c + 1;
 		});
 //        data.forEach(pathData => drawMultiModalPath(pathData, true));
@@ -332,7 +331,7 @@ async function findShortestPath(lon1=null, lat1=null, lon2=null, lat2=null, id=n
 	plot_markers(lon1, lat1, lon2, lat2);
 	changeColor(id);
 	
-    document.getElementById("center").style.display = "block";
+    document.getElementById("legend").style.display = "block";
     document.getElementById("overlay").style.display = "none";
     
 	let endTime = performance.now();
@@ -344,32 +343,53 @@ async function findShortestPath(lon1=null, lat1=null, lon2=null, lat2=null, id=n
 
 /**** UTILS ******/
 function showResults(pathMethod, data, timeElapsed) {
-	var rst = document.getElementById('center');
+
+	var legend = document.getElementById('legend');
 	
-	rst.innerHTML = "";
+	legend.innerHTML = "";
 	if (pathMethod === "singlepath") {
 		var numberPaths = 1;
-		rst.innerHTML += 
-				`<p> <b>${numberPaths}</b> path has been found.</p>\
-				<p> Time used: <b>${timeElapsed.toFixed(3)}</b> seconds.</p>\
-				<br>`;
+		legend.innerHTML += 
+				`<p> <b>${numberPaths}</b> path found.</p>\
+				<p> Time used: <b>${timeElapsed.toFixed(3)}</b> seconds.</p>`;
 	}
 	else {
 		var numberPaths = data.length;
-		rst.innerHTML += 
-				`<p> <b>${numberPaths}</b> paths have been found.</p>\
-				<p> Time used: <b>${timeElapsed.toFixed(3)}</b> seconds.</p>\
-				<br>`;
+		
+		legend.innerHTML += 
+				`<p> (<b>${numberPaths}</b>/${numPaths}) paths found.</p>\
+				<p> Time used: <b>${timeElapsed.toFixed(3)}</b> seconds.</p>`
+		
+		var legendResult = `<table style="width:100%">
+						  <tr>
+						    <th></th>
+						    <th></th>
+						    <th>Distance [m]</th>
+						    <th>Cost</th>
+						  </tr>`;
 		for (let i = 0; i < numberPaths; i++) {
-			rst.innerHTML += 
-				`<p> <b>${numberPaths}</b> paths have been found.</p>\
-				<p> Time used: <b>${timeElapsed.toFixed(3)}</b> seconds.</p>\
-				<br>`;
+			if (i == 0) {
+				legendResult += 
+				  `<tr>
+				    <td> Opt path</td>
+				    <td> <div style="height:10px; width:30px; background-color:${colorCode[i%5]};"></div> </td>
+				    <td> ${data[i].left.toFixed(3)} </td>
+				    <td> ${data[i].middle.toFixed(3)} </td>
+				  </tr>`;
+			} else {
+				legendResult += 
+				  `<tr>
+				    <td> Alt path ${i}</td>
+				    <td> <div style="height:10px; width:30px; background-color:${colorCode[i%5]};"></div> </td>
+				    <td> ${data[i].left.toFixed(3)} </td>
+				    <td> ${data[i].middle.toFixed(3)} </td>
+				  </tr>`;
+			}
 		}
+		legendResult += `</table>`;
+		
+		legend.innerHTML += legendResult;
 	}
-
-
-
 }
 
 function plot_markers(lon1, lat1, lon2, lat2) {
@@ -439,10 +459,8 @@ function checkNumber(id, min=0, max=1) {
 }
 
 function toggleResult() {
-	var form = document.getElementById("center");
-	form.style.display = form.style.display === "block" ? "none" : "block";
 	var legend = document.getElementById("legend");
-	legend.style.display = form.style.display === "none" ? "block" : "none";
+	legend.style.display = legend.style.display === "block" ? "none" : "block";
 }
 /************* --------------------- *************/
 

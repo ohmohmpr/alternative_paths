@@ -2,7 +2,6 @@ package com.lbs.lbs.Base.routing;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -10,7 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.locationtech.jts.geom.Coordinate;
+import org.apache.commons.lang3.tuple.Triple;
 
 import com.lbs.lbs.Base.graph.DiGraph;
 import com.lbs.lbs.Base.graph.DiGraph.DiGraphArc;
@@ -21,10 +20,6 @@ import com.lbs.lbs.Base.graph.types.multimodal.GeofabrikData;
 import com.lbs.lbs.Base.util.MinHeap;
 import com.lbs.lbs.Base.util.MinHeap.HeapItem;
 import com.lbs.lbs.DataSingulation.RoadGraphHolder;
-
-import geotrellis.proj4.CRS;
-import geotrellis.proj4.Transform;
-import scala.Tuple2;
 
 public class BDV<V, E extends WeightedArcData> {
 
@@ -348,7 +343,7 @@ public class BDV<V, E extends WeightedArcData> {
 	}
 	
 	
-	public ArrayList<AlternativePaths<V, E>>  getPaths() throws Exception {
+	public ArrayList<Triple<Double, Double, AlternativePaths<V,E>>>  getPaths() throws Exception {
 		
 		result.add(optimalShortestPath);
 		result.get(0).limited_sharing = 0;
@@ -367,9 +362,11 @@ public class BDV<V, E extends WeightedArcData> {
 				if (!passLocalOptimality) {
 					continue;
 				}
-				System.out.println("result.size() " + result.size());
 //				boolean passUBS = UBS(path);
-				tmp_list_for_sort.add(path);
+				if (passLimitedSharing && passLocalOptimality) {
+					tmp_list_for_sort.add(path);
+				}
+				System.out.println("result.size() " + result.size());
 			}
 			
 			if (tmp_list_for_sort.size() != 0) {
@@ -383,13 +380,16 @@ public class BDV<V, E extends WeightedArcData> {
 			
 		}
 
+		ArrayList<Triple<Double, Double, AlternativePaths<V,E>>> showResult = 
+				new ArrayList<Triple<Double, Double, AlternativePaths<V,E>>>(); ;
 		System.out.println("RESULTs");
 		System.out.println("\npath,               Dist,             Cost");
 		for (AlternativePaths<V, E> path: result) {
 			System.out.println("path: " + path.getdist() + " " + path.getCostFunction());
+			showResult.add(Triple.of(path.getdist(), path.getCostFunction(), path));
 		}
 		
-		return result;
+		return showResult;
 	}
 
 	public boolean UBS(AlternativePaths<V, E> path) {
@@ -445,7 +445,7 @@ public class BDV<V, E extends WeightedArcData> {
 		double length_y = 0;
 
 		DiGraphNode<Point2D, GeofabrikData> NODE_Y = null;
-		while (index_viaNode_B != nodes_B.size() && T_B > 0) {
+		while (index_viaNode_B != nodes_B.size() - 1 && T_B > 0) {
 			DiGraphNode<V, E> viaNode_B = nodes_B.get(index_viaNode_B);
 			index_viaNode_B = index_viaNode_B + 1;
 			DiGraphNode<V, E> predNode_B = nodes_B.get(index_viaNode_B);
@@ -467,10 +467,10 @@ public class BDV<V, E extends WeightedArcData> {
         	passLocalOptimality = true;
         	path.passLocalOptimality = true;
         } 
-        else {
-    		System.out.println("Math.abs(dj_length_x - length_x) " + Math.abs(dj_length_x - length_x));
-    		System.out.println("Math.abs(dj_length_y - length_y) " + Math.abs(dj_length_y - length_y));
-        }
+//        else {
+//    		System.out.println("Math.abs(dj_length_x - length_x) " + Math.abs(dj_length_x - length_x));
+//    		System.out.println("Math.abs(dj_length_y - length_y) " + Math.abs(dj_length_y - length_y));
+//        }
 		
 		return passLocalOptimality;
 	}

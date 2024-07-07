@@ -1,35 +1,25 @@
 package com.lbs.lbs.Service;
 
 import com.lbs.lbs.Base.graph.DiGraph;
-import com.lbs.lbs.Base.graph.DiGraph.DiGraphNode;
 import com.lbs.lbs.Base.graph.types.AlternativePaths;
-import com.lbs.lbs.Base.graph.types.RoadGraph;
 import com.lbs.lbs.Base.graph.types.multimodal.*;
-import com.lbs.lbs.Base.io.GeofabrikFactory;
-import com.lbs.lbs.Base.io.ShapeFileReader;
-import com.lbs.lbs.Base.routing.Dijkstra;
 import com.lbs.lbs.Base.routing.BiDijkstra;
 import com.lbs.lbs.Base.routing.BDV;
 import com.lbs.lbs.Base.routing.MultiModalRouter;
-import com.lbs.lbs.Base.routing.Router;
 import com.lbs.lbs.DataSingulation.MultiModalGraphHolder;
 import com.lbs.lbs.DataSingulation.RoadGraphHolder;
 import com.lbs.lbs.Entity.TransportPath;
-import com.vividsolutions.jump.io.IllegalParametersException;
 import geotrellis.proj4.CRS;
 import geotrellis.proj4.Transform;
+
+import org.apache.commons.lang3.tuple.Triple;
 import org.locationtech.jts.geom.Coordinate;
 import org.springframework.stereotype.Service;
 import scala.Tuple2;
 
 import java.awt.geom.Point2D;
-import java.io.File;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 @Service
 public class ShortestPathService {
@@ -153,7 +143,7 @@ public class ShortestPathService {
 //    }
     
 
-    public static List<List<Coordinate>>  getAlternativeRoutesBDV(double lat1,double lon1,double lat2, double lon2, 
+    public static List< Triple<Double,Double,List<Coordinate>> >  getAlternativeRoutesBDV(double lat1,double lon1,double lat2, double lon2, 
     		int numPaths, double limSharing, double localOpt, double UBS) throws Exception {
 
         Coordinate source = LatLon2EN(lat1, lon1);
@@ -167,12 +157,11 @@ public class ShortestPathService {
         
         dj.run(sourceNode,targetNode);
 
-        List<AlternativePaths<Point2D, GeofabrikData>> ALTpaths = dj.getPaths();
-        System.out.println("size = " + ALTpaths.size());
+        List<Triple<Double, Double, AlternativePaths<Point2D, GeofabrikData>>> ALTpaths = dj.getPaths();
 
-    	List<List<Coordinate>> returnListAltnative = new ArrayList<List<Coordinate>>();
-    	for (AlternativePaths<Point2D, GeofabrikData> alt : ALTpaths) {
-            List<DiGraph.DiGraphNode<Point2D, GeofabrikData>> path = alt.path;
+    	List< Triple<Double,Double,List<Coordinate>> > returnListAltnative = new ArrayList< Triple<Double,Double,List< Coordinate>> >();
+    	for (Triple<Double, Double, AlternativePaths<Point2D, GeofabrikData>> alt : ALTpaths) {
+            List<DiGraph.DiGraphNode<Point2D, GeofabrikData>> path = alt.getRight().path;
             
             List<Coordinate> returnList = new ArrayList<>();
             returnList.add(new Coordinate(lat1,lon1));
@@ -180,7 +169,7 @@ public class ShortestPathService {
 	                returnList.add(EN2LatLon(p.getNodeData().getX(),p.getNodeData().getY()));
 	            }
             returnList.add(new Coordinate(lat2,lon2));
-            returnListAltnative.add(returnList);
+            returnListAltnative.add( Triple.of(alt.getLeft(), alt.getMiddle(), returnList) );
 		}
     	
         return returnListAltnative;

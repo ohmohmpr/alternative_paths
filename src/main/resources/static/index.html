@@ -115,29 +115,17 @@
 	      font-size: 2em;
 	    }
 	    
-		#center {
-		  display: none;
-		  position: absolute;
-		  width: 40%;
-		  height: 60%;
-		  z-index: 15;
-		  top: 20%;
-		  left: 50%;
-		  margin: -100px 0 0 -300px;
-/* 		  background: rgba(0, 78, 159, 0.3); */
-		  background:rgba(255,255,255, 0.4);
-		}
-	    
 		#legend {
 		  display: none;
 		  position: absolute;
-		  width: 10%;
-		  height: 10%;
+		  width: 20%;
+		  min-height: 10%;
+		  overflow: hidden;
 		  z-index: 15;
 		  top: 10%;
 		  left: 23%;
 		  margin: -60px 0 0 -300px;
-		  background:rgba(255,255,255, 0.4);
+		  background:rgba(255,255,255, 0.6);
 		}
 		
 
@@ -200,8 +188,6 @@
 	    	<div id="legend">
 
 	    	</div>
-	    	<div id="center">
-	    	</div>
 		</div>
 
 		<div class="buttons">
@@ -224,6 +210,7 @@
 			<div id="queries" style="display: none;">
 				<form>
 					<button id="query1" type="button" onclick="findShortestPath(7.0839525,50.7275752,7.0962870,50.7324448, this.id)">Query1</button>
+<!-- 					1165.581 -->
 					<button id="query2" type="button" onclick="findShortestPath(7.0773341,50.7347230,7.1202789,50.7203698, this.id)">Query2</button>
 <!-- 					4453.587 -->
 					<button id="query3" type="button" onclick="findShortestPath(7.0200068,50.7458053,7.0991104,50.7388231, this.id)">Query3</button>
