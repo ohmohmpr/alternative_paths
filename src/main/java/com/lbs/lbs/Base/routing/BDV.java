@@ -347,12 +347,11 @@ public class BDV<V, E extends WeightedArcData> {
 		
 		result.add(optimalShortestPath);
 		result.get(0).limited_sharing = 0;
-		System.out.println("Opt cost function " + result.get(0).getCostFunction());
 		boolean NomorePathstoSearch = false; 
 		
 		while (result.size() < numPaths && NomorePathstoSearch == false) {
 			ArrayList<AlternativePaths<V,E>> tmp_list_for_sort = new ArrayList<AlternativePaths<V,E>>();
-			
+			System.out.println("Current size of result: " + result.size());
 			for (AlternativePaths<V, E> path: alternativePaths) {
 				boolean passLimitedSharing = limitedSharing(result, path);
 				if (!passLimitedSharing) {
@@ -362,11 +361,13 @@ public class BDV<V, E extends WeightedArcData> {
 				if (!passLocalOptimality) {
 					continue;
 				}
-//				boolean passUBS = UBS(path);
-				if (passLimitedSharing && passLocalOptimality) {
+				boolean passUBS = UBS(path);
+				if (!passUBS) {
+					continue;
+				}
+				if (passLimitedSharing && passLocalOptimality && passUBS) {
 					tmp_list_for_sort.add(path);
 				}
-				System.out.println("result.size() " + result.size());
 			}
 			
 			if (tmp_list_for_sort.size() != 0) {
@@ -382,8 +383,8 @@ public class BDV<V, E extends WeightedArcData> {
 
 		ArrayList<Triple<Double, Double, AlternativePaths<V,E>>> showResult = 
 				new ArrayList<Triple<Double, Double, AlternativePaths<V,E>>>(); ;
-		System.out.println("RESULTs");
-		System.out.println("\npath,               Dist,             Cost");
+		System.out.println("\nRESULTs");
+		System.out.println("path,               Dist,             Cost");
 		for (AlternativePaths<V, E> path: result) {
 			System.out.println("path: " + path.getdist() + " " + path.getCostFunction());
 			showResult.add(Triple.of(path.getdist(), path.getCostFunction(), path));
@@ -393,18 +394,39 @@ public class BDV<V, E extends WeightedArcData> {
 	}
 
 	public boolean UBS(AlternativePaths<V, E> path) {
-		boolean passUBS = false;
+
+		if (path.UBStested) {
+			return path.passUBS;
+		} else {
+			path.UBStested = true;
+		}
 		
-		return passUBS;
+		if (path.NODE_X == null || path.NODE_X == null || path.length_x == 0  || path.length_y == 0) {
+			path.passUBS = false;
+			return path.passUBS;
+		}
+		
+		double shortestLengthFromXtoY = this.dj.run(path.NODE_X,path.NODE_Y);
+		double UBSLength = (1 + this.epsilon) * shortestLengthFromXtoY;
+		double detour_X_Y = path.length_x + path.length_y;
+		
+		if (detour_X_Y <= UBSLength) {
+			path.passUBS = true;
+			return path.passUBS;
+		} 
+		
+		System.out.println("DEAD -> UBS");
+    	
+		return path.passUBS;
 	}
 	
     
 	public boolean localOptimality(AlternativePaths<V, E> path) throws Exception {
-		
-		boolean passLocalOptimality = false;
 
-		if (path.passLocalOptimality) {
-			return true;
+		if (path.LocalOptimalitytested) {
+			return path.passLocalOptimality;
+		} else {
+			path.LocalOptimalitytested = true;
 		}
 		
 		int counter_index = 0;
@@ -464,20 +486,24 @@ public class BDV<V, E extends WeightedArcData> {
 
         if (Math.abs(dj_length_x - length_x) < 1e-6 && 
         		Math.abs(dj_length_y - length_y) < 1e-6 ) {
-        	passLocalOptimality = true;
         	path.passLocalOptimality = true;
+        	// it should not be written this way, should be separated into a pure function.
+        	path.NODE_X = NODE_X;
+        	path.NODE_Y = NODE_Y;
+        	path.length_x = length_x;
+        	path.length_y = length_y;
+        	return path.passLocalOptimality;
         } 
-//        else {
-//    		System.out.println("Math.abs(dj_length_x - length_x) " + Math.abs(dj_length_x - length_x));
-//    		System.out.println("Math.abs(dj_length_y - length_y) " + Math.abs(dj_length_y - length_y));
-//        }
-		
-		return passLocalOptimality;
+		System.out.println("DEAD -> localOptimality");
+ 
+		return path.passLocalOptimality;
 	}
 	
 	public boolean limitedSharing(ArrayList<AlternativePaths<V,E>> result, AlternativePaths<V, E> path) {
 
-		boolean passLimitedSharing = false;
+		if (path.LimitedSharingtested == true && path.passLimitedSharing == false) {
+			return path.passLimitedSharing;
+		}
 
 		for (AlternativePaths<V,E> path_result: result) {
 			
@@ -508,16 +534,15 @@ public class BDV<V, E extends WeightedArcData> {
 			if ( sigma/path.getdist() < gamma) {
 				path.limited_sharing = path.limited_sharing + sigma;
 				path.passLimitedSharing = true;
-				passLimitedSharing = true;
 			} else {
 				path.limited_sharing = Double.MAX_VALUE;
 				path.passLimitedSharing = false;
-				passLimitedSharing = false;
-				break;
+				path.LimitedSharingtested = true;
+				return path.passLimitedSharing;
 			}
 		}
 		
-		return passLimitedSharing;
+		return path.passLimitedSharing;
 	}
 
 	

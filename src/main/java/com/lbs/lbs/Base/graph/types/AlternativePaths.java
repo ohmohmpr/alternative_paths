@@ -1,10 +1,12 @@
 package com.lbs.lbs.Base.graph.types;
 
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.lbs.lbs.Base.graph.DiGraph.DiGraphArc;
 import com.lbs.lbs.Base.graph.DiGraph.DiGraphNode;
+import com.lbs.lbs.Base.graph.types.multimodal.GeofabrikData;
 
 public class AlternativePaths<V, E extends WeightedArcData> {
 
@@ -12,13 +14,18 @@ public class AlternativePaths<V, E extends WeightedArcData> {
 	public double dist;
 	public double limited_sharing = 0;
 	public boolean passLimitedSharing = false;
+	public boolean LimitedSharingtested = false;
 	public boolean passLocalOptimality = false;
+	public boolean LocalOptimalitytested = false;
 	public boolean passUBS = false;
+	public boolean UBStested = false;
+	public DiGraphNode<Point2D,GeofabrikData> NODE_X = null;
+	public DiGraphNode<Point2D,GeofabrikData> NODE_Y = null;
+	public double length_x = 0;
+	public double length_y = 0;
 	
 	public ArrayList<DiGraphNode<V, E>> path;
 	public ArrayList<DiGraphArc<V, E>> pathArcs;
-	
-	// 3 properties: stretch, sharing, detour path;
 	
 	public AlternativePaths(
 			int commonNodeID, double dist,
