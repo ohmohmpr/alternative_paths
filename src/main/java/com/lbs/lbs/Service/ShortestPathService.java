@@ -89,7 +89,7 @@ public class ShortestPathService {
 //        return returnList_nodes;
 //    }
 
-    public static List<Coordinate>  getShortestPathBiDi(double lat1,double lon1,double lat2, double lon2) throws Exception {
+    public static Triple<Double, Double, List<Coordinate>>  getShortestPathBiDi(double lat1,double lon1,double lat2, double lon2) throws Exception {
 
         Coordinate source = LatLon2EN(lat1, lon1);
         Coordinate target = LatLon2EN(lat2, lon2);
@@ -100,6 +100,7 @@ public class ShortestPathService {
 
         BiDijkstra<Point2D, GeofabrikData> dj = new BiDijkstra<Point2D, GeofabrikData>(graphHolder.getRoadGraph());
         dj.run(sourceNode,targetNode);
+        double length = dj.shortestPathLength;
 
         List<DiGraph.DiGraphNode<Point2D, GeofabrikData>> path = dj.getPath();
         List<Coordinate> returnList = new ArrayList<>();
@@ -110,7 +111,8 @@ public class ShortestPathService {
         }
         returnList.add(new Coordinate(lat2,lon2));
         /** return shortest path */
-        return returnList;
+        
+        return Triple.of(length, null, returnList);
     }
     
 

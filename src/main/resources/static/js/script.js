@@ -309,9 +309,8 @@ async function findShortestPath(lon1=null, lat1=null, lon2=null, lat2=null, id=n
     const res = await fetch(url);
     const data = await res.json();
 
-
     if (routeMethod !== "multimodalroute" && pathMethod === "singlepath") {
-        drawPath(data);
+        drawPath(data.right);
     } else if (routeMethod === "multimodalroute" && pathMethod === "singlepath") {
         clearOldLayers();
         drawMultiModalPath(data)
@@ -347,13 +346,14 @@ function showResults(pathMethod, data, timeElapsed) {
 	var legend = document.getElementById('legend');
 	
 	legend.innerHTML = "";
-	if (pathMethod === "singlepath") {
+	if (pathMethod === "singlepath" && routeMethod !== "multimodalroute") {
 		var numberPaths = 1;
 		legend.innerHTML += 
 				`<p> <b>${numberPaths}</b> path found.</p>\
-				<p> Time used: <b>${timeElapsed.toFixed(3)}</b> seconds.</p>`;
+				<p> Time used: <b>${timeElapsed.toFixed(3)}</b> seconds.</p>
+				<p> Distance[m]: <b>${data.left.toFixed(3)}</b> m.</p>`;
 	}
-	else {
+	else if (pathMethod !== "singlepath" && routeMethod !== "multimodalroute"){
 		var numberPaths = data.length;
 		
 		legend.innerHTML += 
@@ -389,6 +389,9 @@ function showResults(pathMethod, data, timeElapsed) {
 		legendResult += `</table>`;
 		
 		legend.innerHTML += legendResult;
+	} else {
+		var legend = document.getElementById("legend");
+		legend.style.display = "none";
 	}
 }
 

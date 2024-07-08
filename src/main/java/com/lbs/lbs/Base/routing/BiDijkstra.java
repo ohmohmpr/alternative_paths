@@ -29,7 +29,7 @@ public class BiDijkstra<V, E extends WeightedArcData> {
 	protected HeapItem<DiGraphNode<V, E>> items_B[];
 	public DiGraphNode<V, E> pred_B[];
 
-	protected double shortestPathLength = Double.MAX_VALUE;
+	public double shortestPathLength = Double.MAX_VALUE;
 	protected int currentStamp = 0;
 	public int commonNodeID;
 	
