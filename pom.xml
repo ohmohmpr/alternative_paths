@@ -95,7 +95,7 @@
     </dependencies>
 
     <build>
-        <finalName>lbsproject-ohm</finalName>
+        <finalName>lbsproject-lara-ohm</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -116,7 +116,7 @@
                 <configuration>
                     <url>https://geonet.igg.uni-bonn.de/manager/text</url>
                     <server>lbs2023</server>
-                    <path>/lbsproject-ohm</path>
+                    <path>/lbsproject-lara-ohm</path>
                 </configuration>
             </plugin>
             <plugin>

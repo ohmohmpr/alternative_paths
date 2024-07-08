@@ -1,75 +1,76 @@
 package com.lbs.lbs.Base.graph.types;
 
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.lbs.lbs.Base.graph.DiGraph.DiGraphArc;
 import com.lbs.lbs.Base.graph.DiGraph.DiGraphNode;
+import com.lbs.lbs.Base.graph.types.multimodal.GeofabrikData;
 
-public class AlternativePaths<V, E> {
+public class AlternativePaths<V, E extends WeightedArcData> {
 
 	public int commonNodeID;
 	public double dist;
-	public double dist_F;
-	public double dist_B;
 	public double limited_sharing = 0;
+	public boolean passLimitedSharing = false;
+	public boolean LimitedSharingtested = false;
+	public boolean passLocalOptimality = false;
+	public boolean LocalOptimalitytested = false;
+	public boolean passUBS = false;
+	public boolean UBStested = false;
+	public DiGraphNode<Point2D,GeofabrikData> NODE_X = null;
+	public DiGraphNode<Point2D,GeofabrikData> NODE_Y = null;
+	public double length_x = 0;
+	public double length_y = 0;
+	
 	public ArrayList<DiGraphNode<V, E>> path;
-	public ArrayList<Double> weights;
+	public ArrayList<DiGraphArc<V, E>> pathArcs;
 	
-	// 3 properties: stretch, sharing, detour path;
-	
-	public AlternativePaths(int commonNodeID, double dist, double dist_F, double dist_B
-			, List<DiGraphNode<V, E>> path, List<Double> weights) {
+	public AlternativePaths(
+			int commonNodeID, double dist,
+			List<DiGraphNode<V, E>> path, 
+			List<DiGraphArc<V, E>> pathArcs) {
 		this.commonNodeID = commonNodeID;
 		this.dist = dist;
-		this.dist_F = dist_F;
-		this.dist_B = dist_B;
 		this.path = new ArrayList<DiGraphNode<V, E>>(path);
-		this.weights = new ArrayList<Double>(weights);
+		this.pathArcs = new ArrayList<DiGraphArc<V, E>>(pathArcs);
+		
 	}
 	
     public double getdist() {
         return dist;
     }
     
-    public double getdist_F() {
-        return dist_F;
-    }
-    
-    public double getdist_B() {
-        return dist_B;
-    }
-    
     public double getSizePath() {
         return path.size();
     }
     
-    public double getSizeweight() {
-        return weights.size();
+    public double getCostFunction() {
+        return 2*dist + limited_sharing;
     }
 
     public void printNodeAndWeight() {
     	
-    	for (int i =0; i<weights.size(); ++i) {
-    		System.out.println(path.get(i).getId() +", " + path.get(i) +", " +weights.get(i) );
+    	for (int i =0; i<pathArcs.size(); ++i) {
+    		System.out.println(path.get(i).getId() +", " + path.get(i) +", " +pathArcs.get(i) );
     	}
     	
     }
     
-    
-    public double getTotalweight() {
+    public double getTotalPathArcs() {
     	
-    	double total_weight = 0;
-    	for ( double w_C : weights) {
-    		total_weight = total_weight + w_C;
+    	double totalPathArcs = 0;
+    	for ( DiGraphArc<V, E> arc : pathArcs) {
+    		totalPathArcs = totalPathArcs + arc.getArcData().getValue();
     	}
 
-        return total_weight;
+        return totalPathArcs;
     }
     
     public void print() {
     	
-    	System.out.println(dist+", "+commonNodeID+", "+limited_sharing+", "+weights.size());
+    	System.out.println(dist+", "+commonNodeID+", "+limited_sharing+", "+getCostFunction()+", "+ (dist - getTotalPathArcs()));
 
     }
     

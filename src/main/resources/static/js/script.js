@@ -47,7 +47,7 @@ const clearOldLayers = () => {
 /************* --------------------- *************/
 
 /**** CONSTANTS ******/
-const GROUP_NAME = "lbsproject-ohm";
+const GROUP_NAME = "lbsproject-lara-ohm";
 const BASE_URL = "http://localhost:8080";
 // const BASE_URL = "https://geonet.igg.uni-bonn.de";
 const LEFT_BOTTOM = ol.proj.transform([7.004813999686911, 50.67771640948173], "EPSG:4326", "EPSG:3857");
@@ -68,8 +68,8 @@ const MAX_Y = RIGHT_TOP[1];
 const FIRST_MARKER_ICON = new ol.style.Style({
     image: new ol.style.Icon({
         crossOrigin: 'anonymous',
-        src: 'https://cdn1.iconfinder.com/data/icons/web-55/32/web_1-1024.png',
-        scale: "0.03"
+        src: 'https://cdn0.iconfinder.com/data/icons/digital-marketing-2-22/48/62-1024.png',
+        scale: "0.032"
     }),
 });
 
@@ -98,6 +98,10 @@ SECOND_MARKER.setStyle(SECOND_MARKER_ICON);
 /***** INPUT ELEMENTS *****/
 const firstCoordInput = document.getElementById("coord1");
 const secondCoordInput = document.getElementById("coord2");
+var numPaths = 3;
+var limitedSharing = 0.80;
+var localOptimality = 0.25;
+var UBS = 0.25;
 /**** -------- *****/
 
 
@@ -142,6 +146,8 @@ let secondMarkerLayer;
 let routeMethod = "shortestpathbidi"; // shortestpath, shortestpathbidi
 let pathMethod = "singlepath";
 let ptCount = 0;
+let colorCode = ["#0080ff", "#FF0000", "#008000", "#ffA500", "#800080"];
+// blue, green, red, orange, purple.
 /**** -------- *****/
 
 
@@ -275,6 +281,9 @@ MAP.on("click", function (e) {
 /**** METHODS ******/
 async function findShortestPath(lon1=null, lat1=null, lon2=null, lat2=null, id=null) {
 
+    let startTime = performance.now();
+
+	validateBDV();
     clearOldLayers();
     if (lon1 === null && lat1 === null && lon2 === null && lat2 === null){
 	    [lon1, lat1] = [parseFloat(firstCoordInput.value.split(",")[0]), parseFloat(firstCoordInput.value.split(",")[1])];
@@ -287,13 +296,19 @@ async function findShortestPath(lon1=null, lat1=null, lon2=null, lat2=null, id=n
 		clearLayer(secondMarkerLayer);
 	}
 
-    let url = `${BASE_URL}/${GROUP_NAME}/ex1/${pathMethod}-${routeMethod}?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
+	if (pathMethod === "alternativepath") {
+	   url = `${BASE_URL}/${GROUP_NAME}/ex1/${pathMethod}-${routeMethod}?`+
+	   		`lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`+
+	   		`&numPaths=${numPaths}&limitedSharing=${limitedSharing}`+
+	   		`&localOptimality=${localOptimality}&UBS=${UBS}`;
+	} else {
+	   url = `${BASE_URL}/${GROUP_NAME}/ex1/${pathMethod}-${routeMethod}?lat1=${lat1}&lon1=${lon1}&lat2=${lat2}&lon2=${lon2}`;
+	}
 
     document.getElementById("overlay").style.display = "flex";
     const res = await fetch(url);
     const data = await res.json();
-    
-    console.log(data)
+
 
     if (routeMethod !== "multimodalroute" && pathMethod === "singlepath") {
         drawPath(data);
@@ -302,10 +317,9 @@ async function findShortestPath(lon1=null, lat1=null, lon2=null, lat2=null, id=n
         drawMultiModalPath(data)
     } else if (routeMethod !== "multimodalroute" && pathMethod === "alternativepath") {
         clearOldLayers();
-        colorCode = ["#0080ff", "#FF0000", "#008000", "#ffA500"];
         i_c = 0;
         data.forEach(pathData =>  {
-			drawPath(pathData,colorCode[i_c%colorCode.length])
+			drawPath(pathData.right,colorCode[i_c%colorCode.length])
 			i_c = i_c + 1;
 		});
 //        data.forEach(pathData => drawMultiModalPath(pathData, true));
@@ -316,12 +330,68 @@ async function findShortestPath(lon1=null, lat1=null, lon2=null, lat2=null, id=n
 
 	plot_markers(lon1, lat1, lon2, lat2);
 	changeColor(id);
-        
+	
+    document.getElementById("legend").style.display = "block";
     document.getElementById("overlay").style.display = "none";
+    
+	let endTime = performance.now();
+	let timeElapsed = endTime - startTime;
+	showResults(pathMethod, data, timeElapsed/1000);
+
 }
 /************* --------------------- *************/
 
 /**** UTILS ******/
+function showResults(pathMethod, data, timeElapsed) {
+
+	var legend = document.getElementById('legend');
+	
+	legend.innerHTML = "";
+	if (pathMethod === "singlepath") {
+		var numberPaths = 1;
+		legend.innerHTML += 
+				`<p> <b>${numberPaths}</b> path found.</p>\
+				<p> Time used: <b>${timeElapsed.toFixed(3)}</b> seconds.</p>`;
+	}
+	else {
+		var numberPaths = data.length;
+		
+		legend.innerHTML += 
+				`<p> (<b>${numberPaths}</b>/${numPaths}) paths found.</p>\
+				<p> Time used: <b>${timeElapsed.toFixed(3)}</b> seconds.</p>`
+		
+		var legendResult = `<table style="width:100%">
+						  <tr>
+						    <th></th>
+						    <th></th>
+						    <th>Distance [m]</th>
+						    <th>Cost</th>
+						  </tr>`;
+		for (let i = 0; i < numberPaths; i++) {
+			if (i == 0) {
+				legendResult += 
+				  `<tr>
+				    <td> Opt path</td>
+				    <td> <div style="height:10px; width:30px; background-color:${colorCode[i%5]};"></div> </td>
+				    <td> ${data[i].left.toFixed(3)} </td>
+				    <td> ${data[i].middle.toFixed(3)} </td>
+				  </tr>`;
+			} else {
+				legendResult += 
+				  `<tr>
+				    <td> Alt path ${i}</td>
+				    <td> <div style="height:10px; width:30px; background-color:${colorCode[i%5]};"></div> </td>
+				    <td> ${data[i].left.toFixed(3)} </td>
+				    <td> ${data[i].middle.toFixed(3)} </td>
+				  </tr>`;
+			}
+		}
+		legendResult += `</table>`;
+		
+		legend.innerHTML += legendResult;
+	}
+}
+
 function plot_markers(lon1, lat1, lon2, lat2) {
 	
     MAP.setView(new ol.View({
@@ -359,6 +429,39 @@ function changeColor(id) {
 
 }
 
+function validateBDV() {
+
+	if (document.getElementById("numPaths").value == "") {
+		document.getElementById("numPaths").value = 3;
+	}
+	numPaths = document.getElementById("numPaths").value;
+	
+	if (document.getElementById("limitedSharing").value == "") {
+		document.getElementById("limitedSharing").value = 0.8;
+	}
+	limitedSharing = document.getElementById("limitedSharing").value;
+	
+	if (document.getElementById("localOptimality").value == "") {
+		document.getElementById("localOptimality").value = 0.25;
+	}
+	localOptimality = document.getElementById("localOptimality").value;
+	
+	if (document.getElementById("UBS").value == "") {
+		document.getElementById("UBS").value = 0.25;
+	}
+	UBS = document.getElementById("UBS").value;
+ }
+
+function checkNumber(id, min=0, max=1) {
+	  let number = document.getElementById(id).value;
+	  if (number>max || number<min)
+		  document.getElementById(id).value = "";
+}
+
+function toggleResult() {
+	var legend = document.getElementById("legend");
+	legend.style.display = legend.style.display === "block" ? "none" : "block";
+}
 /************* --------------------- *************/
 
 
