@@ -344,14 +344,18 @@ public class BDV<V, E extends WeightedArcData> {
 	
 	
 	public ArrayList<Triple<Double, Double, AlternativePaths<V,E>>>  getPaths() throws Exception {
-		
+
+		//initialize:
 		result.add(optimalShortestPath);
 		result.get(0).limited_sharing = 0;
-		boolean NomorePathstoSearch = false; 
-		
+		boolean NomorePathstoSearch = false;
+
+		// search throw the whole alternative path list as long as there are not numPath in the resultList
 		while (result.size() < numPaths && NomorePathstoSearch == false) {
 			ArrayList<AlternativePaths<V,E>> tmp_list_for_sort = new ArrayList<AlternativePaths<V,E>>();
 			System.out.println("Current size of result: " + result.size());
+			
+			//test all path in the alternative path list to LimitedSharing, LocalOptimality and UBS
 			for (AlternativePaths<V, E> path: alternativePaths) {
 				boolean passLimitedSharing = limitedSharing(result, path);
 				if (!passLimitedSharing) {
@@ -361,18 +365,15 @@ public class BDV<V, E extends WeightedArcData> {
 				if (!passLocalOptimality) {
 					continue;
 				}
-				boolean passUBS = UBS(path);
-				if (!passUBS) {
-					continue;
-				}
-				if (passLimitedSharing && passLocalOptimality && passUBS) {
+				if (passLimitedSharing && passLocalOptimality) {
 					tmp_list_for_sort.add(path);
 				}
 			}
-			
+			// sort the alternative paths which passed all three conditions by the performance in the cost_function
 			if (tmp_list_for_sort.size() != 0) {
 				tmp_list_for_sort.sort(Comparator.comparing(a -> a.getCostFunction()));
 				AlternativePaths<V,E> bestOne = tmp_list_for_sort.get(0);
+				// add the best on and remove it from the alternative path list
 				result.add(bestOne);
 				alternativePaths.remove(alternativePaths.indexOf(bestOne));
 			} else {
@@ -380,7 +381,7 @@ public class BDV<V, E extends WeightedArcData> {
 			}
 			
 		}
-
+		// print the result in the console
 		ArrayList<Triple<Double, Double, AlternativePaths<V,E>>> showResult = 
 				new ArrayList<Triple<Double, Double, AlternativePaths<V,E>>>(); ;
 		System.out.println("\nRESULTs");
@@ -392,43 +393,17 @@ public class BDV<V, E extends WeightedArcData> {
 		
 		return showResult;
 	}
-
-	public boolean UBS(AlternativePaths<V, E> path) {
-
-		if (path.UBStested) {
-			return path.passUBS;
-		} else {
-			path.UBStested = true;
-		}
-		
-		if (path.NODE_X == null || path.NODE_X == null || path.length_x == 0  || path.length_y == 0) {
-			path.passUBS = false;
-			return path.passUBS;
-		}
-		
-		double shortestLengthFromXtoY = this.dj.run(path.NODE_X,path.NODE_Y);
-		double UBSLength = (1 + this.epsilon) * shortestLengthFromXtoY;
-		double detour_X_Y = path.length_x + path.length_y;
-		
-		if (detour_X_Y <= UBSLength) {
-			path.passUBS = true;
-			return path.passUBS;
-		} 
-		
-		System.out.println("DEAD -> UBS");
-    	
-		return path.passUBS;
-	}
 	
-    
+    //test the second condition: locally optimal
 	public boolean localOptimality(AlternativePaths<V, E> path) throws Exception {
-
+		// if already tested -> return result
 		if (path.LocalOptimalitytested) {
 			return path.passLocalOptimality;
 		} else {
+			//initialize the variable with true
 			path.LocalOptimalitytested = true;
 		}
-		
+		// search the list index of the common_node
 		int counter_index = 0;
 		for (DiGraphNode<V, E> node :path.path ) {
 			counter_index = counter_index + 1;
@@ -436,97 +411,94 @@ public class BDV<V, E extends WeightedArcData> {
 				break;
 			}
 		}
+		//initialize:
 		List<DiGraphNode<V, E>>  nodes_F = path.path.subList(0, counter_index);
 		List<DiGraphNode<V, E>>  nodes_B = path.path.subList(counter_index, path.path.size());
-		
+
 		int index_viaNode_F = counter_index-1;
 		DiGraphNode<Point2D, GeofabrikData> viaNode = (DiGraphNode<Point2D, GeofabrikData>) nodes_F.get(index_viaNode_F);
-		
+
 		double T_F = this.alpha * this.optimalLength;
 		double length_x = 0;
 
-		DiGraphNode<Point2D, GeofabrikData> NODE_X = null;
-		DiGraphNode<V, E> viaNode_F = null;
+		DiGraphNode<Point2D, GeofabrikData> NODE_X = viaNode;
+		DiGraphNode<V, E> viaNode_F = (DiGraphNode<V, E>) viaNode;
+		// search the NODE_X with is at least T away in the forward direction
 		while (index_viaNode_F != 0 && T_F > 0) {
 			viaNode_F = nodes_F.get(index_viaNode_F);
 			index_viaNode_F = index_viaNode_F - 1;
 			DiGraphNode<V, E> predNode_F = nodes_F.get(index_viaNode_F);
-
+			
+			// subtract the distance of the test variable T_F
 			T_F = T_F - viaNode_F.getFirstOutgoingArcTo(predNode_F).getArcData().getValue();
 			if (T_F > 0) {
+				//save the distance 
 				length_x = length_x + viaNode_F.getFirstOutgoingArcTo(predNode_F).getArcData().getValue();				
 			}
-
+			// set those variable one step further
 			NODE_X = (DiGraphNode<Point2D, GeofabrikData>) viaNode_F;
 			viaNode_F = predNode_F;
 		}
-
+		//initialize:
 		int index_viaNode_B = 0;
 
 		double T_B = this.alpha * this.optimalLength;
 		double length_y = 0;
 
-		DiGraphNode<Point2D, GeofabrikData> NODE_Y = null;
-		DiGraphNode<V, E> viaNode_B = null;
+		DiGraphNode<Point2D, GeofabrikData> NODE_Y = viaNode;
+		DiGraphNode<V, E> viaNode_B = (DiGraphNode<V, E>) viaNode;
+		// search the NODE_Y with is at least T away in the backward direction
 		while (index_viaNode_B != nodes_B.size() - 1 && T_B > 0) {
 			viaNode_B = nodes_B.get(index_viaNode_B);
 			index_viaNode_B = index_viaNode_B + 1;
 			DiGraphNode<V, E> predNode_B = nodes_B.get(index_viaNode_B);
-
+			
+			// subtract the distance of the test variable T_B
 			T_B = T_B - viaNode_B.getFirstOutgoingArcTo(predNode_B).getArcData().getValue();
 			if (T_B > 0) {
+				//save the distance
 				length_y = length_y + viaNode_B.getFirstOutgoingArcTo(predNode_B).getArcData().getValue();				
 			}
-
+			// set those variable one step further
 			NODE_Y = (DiGraphNode<Point2D, GeofabrikData>) viaNode_B;
 			viaNode_B = predNode_B;
 		}
 
-		if (NODE_X == null || NODE_X == null || viaNode_F == null || viaNode_B == null ) {		
-			path.passLocalOptimality = false;
-			return path.passLocalOptimality;
-		}
+		double dj_length_X_Y = this.dj.run(NODE_X,NODE_Y);	
 
-		double dj_length_x = this.dj.run(NODE_X,viaNode);
-		double dj_length_y = this.dj.run(viaNode,NODE_Y);	
-
-        if (Math.abs(dj_length_x - length_x) < 1e-6 && 
-        		Math.abs(dj_length_y - length_y) < 1e-6 ) {
+		//compare the length of the shortest path and the actual path
+        if (Math.abs(dj_length_X_Y - (length_x+length_y)) < 1e-6 ){
         	path.passLocalOptimality = true;
-        	// it should not be written this way, should be separated into a pure function.
-        	path.NODE_X = NODE_X;
-        	path.NODE_Y = NODE_Y;
-        	path.length_x = length_x;
-        	path.length_y = length_y;
         	return path.passLocalOptimality;
         } 
 		System.out.println("DEAD -> localOptimality");
  
 		return path.passLocalOptimality;
 	}
-	
-	public boolean limitedSharing(ArrayList<AlternativePaths<V,E>> result, AlternativePaths<V, E> path) {
 
+	// test the first condition: limited sharing with the optimal path and all already found alternative paths
+	public boolean limitedSharing(ArrayList<AlternativePaths<V,E>> result, AlternativePaths<V, E> path) {
+		// if already tested and limited sharing amount was to big-> return result
 		if (path.LimitedSharingtested == true && path.passLimitedSharing == false) {
 			return path.passLimitedSharing;
 		}
-
-		for (AlternativePaths<V,E> path_result: result) {
-			
+		// go to the whole result list to get the sharing with the optimal path and all thealready found alternative paths
+		for (AlternativePaths<V,E> path_result: result) { // not necassary -> is contained in opt_dist
+			// get an Array with the distance from the start node to all nodes on the path
 			double [] opt_dist = getoptdistArray(path_result);
-			
+			//initialize:
 			double sigma = 0;
 			int same_node_counter = 0;
 			int prev_node_id = 0;
+			// check all nodes on the path:
 			for (DiGraphNode<V, E> node: path.path) {
 				// if the current node is in the optimal path
 				if (opt_dist[node.getId()] != 0 ) {
-					//if also the previous node is in the optimal path
+					// and if also the previous node is in the optimal path
 					if ( same_node_counter > 0) {
 						// add the distance between current and previous node to sigma
 						sigma = sigma + opt_dist[node.getId()] - opt_dist[prev_node_id];
-
-					}//if also the previous node is not in the optimal path just add the counter
+					}//if the previous node is not in the optimal path just add the counter
 					else {
 						same_node_counter++;
 					}
@@ -536,8 +508,9 @@ public class BDV<V, E extends WeightedArcData> {
 				}
 				prev_node_id = node.getId();
 			}
-			
+			// check whether the sharing distance is bigger than gamma* the length of the optimal path
 			if ( sigma/path.getdist() < gamma) {
+				//save the sharing amount 
 				path.limited_sharing = path.limited_sharing + sigma;
 				path.passLimitedSharing = true;
 			} else {

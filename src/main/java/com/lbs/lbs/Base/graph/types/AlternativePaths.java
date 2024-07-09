@@ -17,12 +17,6 @@ public class AlternativePaths<V, E extends WeightedArcData> {
 	public boolean LimitedSharingtested = false;
 	public boolean passLocalOptimality = false;
 	public boolean LocalOptimalitytested = false;
-	public boolean passUBS = false;
-	public boolean UBStested = false;
-	public DiGraphNode<Point2D,GeofabrikData> NODE_X = null;
-	public DiGraphNode<Point2D,GeofabrikData> NODE_Y = null;
-	public double length_x = 0;
-	public double length_y = 0;
 	
 	public ArrayList<DiGraphNode<V, E>> path;
 	public ArrayList<DiGraphArc<V, E>> pathArcs;
