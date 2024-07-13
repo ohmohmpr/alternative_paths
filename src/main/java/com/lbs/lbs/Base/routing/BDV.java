@@ -184,7 +184,6 @@ public class BDV<V, E extends WeightedArcData> {
 			curr_dist_B = dist_B[u_B.getId()];
 
 			if (currentLength > (1 + epsilon) * optimalLength) {
-				System.out.println((1 + epsilon) * optimalLength);
 				break;
 			}
 			// top_s < top_t -> Forward search
