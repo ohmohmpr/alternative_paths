@@ -189,6 +189,7 @@ public class BDV<V, E extends WeightedArcData> {
 			// top_s < top_t -> Forward search
 			if (curr_dist_F <= curr_dist_B) {
 				queue_F.extractMin();
+				this.visited_F[u_F.getId()] = true;
 				//iterate through the neighbors of u
 				for (Iterator<DiGraphNode<V, E>> it = nit.getIterator(u_F); it.hasNext();) {
 					DiGraphNode<V, E> v = it.next();
@@ -199,7 +200,8 @@ public class BDV<V, E extends WeightedArcData> {
 					commonNodeID = v.getId();
 					currentLength =  dist_F[commonNodeID] + dist_B[commonNodeID];
 					// if the node got already investigated but not visited in the backward search -> new path
-					if (items_B[v.getId()] != null && currentLength < (1 + epsilon) * optimalLength) {
+					if (items_B[v.getId()] != null && currentLength < (1 + epsilon) * optimalLength
+							&& visited_B[v.getId()]==false && visited_F[v.getId()]==false) {
 
 						AlternativePaths<V, E> alternativePath = new AlternativePaths<>(
 								commonNodeID, currentLength,
@@ -221,6 +223,7 @@ public class BDV<V, E extends WeightedArcData> {
 			} // top_s > top_t -> Backward search
 			else {
 				queue_B.extractMin();
+				this.visited_B[u_B.getId()] = true;
 				for (Iterator<DiGraphNode<V, E>> it = nit.getIterator(u_B); it.hasNext();) {
 					DiGraphNode<V, E> v = it.next();
 
@@ -230,7 +233,8 @@ public class BDV<V, E extends WeightedArcData> {
 					// if the node got already investigated but not visited in the forward search -> new path
 					commonNodeID = v.getId();
 					currentLength =  dist_F[commonNodeID] + dist_B[commonNodeID];
-	 				if (items_F[v.getId()] != null  && currentLength < (1 + epsilon) * optimalLength) {
+	 				if (items_F[v.getId()] != null  && currentLength < (1 + epsilon) * optimalLength
+	 						&& visited_B[v.getId()]==false && visited_F[v.getId()]==false) {
 
 						AlternativePaths<V, E> alternativePath = new AlternativePaths<>(
 								commonNodeID, currentLength,
