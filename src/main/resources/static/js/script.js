@@ -41,6 +41,7 @@ const createLayerVector = (features) => {
 const clearOldLayers = () => {
     if (oldLineArr.length > 0) {
         oldLineArr.forEach(item => clearLayer(item));
+        MarkerLayers.forEach(item => clearLayer(item));
         oldLineArr.splice(0, oldLineArr.length);
     }
 };
@@ -92,6 +93,7 @@ const SECOND_MARKER = new ol.Feature({
     geometry: new ol.geom.Point(1,1)
 });
 SECOND_MARKER.setStyle(SECOND_MARKER_ICON);
+var MarkerLayers = [];
 /**** -------- *****/
 
 
@@ -176,7 +178,6 @@ function drawPath(path, colorCode="") {
 	}
     	
     const points = [];
-
     for (let i = 0; i < path.length; i++) {
         let coord = path[i];
         let point = ol.proj.fromLonLat([coord.y, coord.x]);
@@ -184,14 +185,37 @@ function drawPath(path, colorCode="") {
         points.push(point);
     }
 
-    let lineString = new ol.geom.LineString(points);
-    let lineFeature = new ol.Feature({
-        geometry: lineString
-    });
+	if (points.length != 1) {
+	    let lineString = new ol.geom.LineString(points);
+	    let lineFeature = new ol.Feature({
+	        geometry: lineString
+	    });
+	
+	    lineFeature.setStyle(WALK_LINE_STYLE);
+	    line = createLayerVector([lineFeature]);
+	    addLayer(line);
+	} else {
+		const WALK_LINE_STYLE = new ol.style.Style({
+		    image: new ol.style.Circle({
+		        radius: 5,
+		        fill: new ol.style.Fill({color: 'black'}),
+		        stroke: new ol.style.Stroke({
+		           color: [255,0,0], width: 1
+		        })
+		      })
+		});
 
-    lineFeature.setStyle(WALK_LINE_STYLE);
-    line = createLayerVector([lineFeature]);
-    addLayer(line);
+		const MARKER = new ol.Feature({
+		    geometry: new ol.geom.Point(1,1)
+		});
+		MARKER.setStyle(WALK_LINE_STYLE);
+		
+        MARKER.getGeometry().setCoordinates(points[0]);
+        MarkerLayer = createLayerVector([MARKER]);
+        MarkerLayers.push(MarkerLayer);
+        addLayer(MarkerLayer, false);
+		
+	}
 }
 
 
@@ -318,7 +342,9 @@ async function findShortestPath(lon1=null, lat1=null, lon2=null, lat2=null, id=n
         clearOldLayers();
         i_c = 0;
         data.forEach(pathData =>  {
-			drawPath(pathData.right,colorCode[i_c%colorCode.length])
+			drawPath(pathData.right.left,colorCode[i_c%colorCode.length])
+			viaNode = [pathData.right.right]
+			drawPath(viaNode, "#000000")
 			i_c = i_c + 1;
 		});
 //        data.forEach(pathData => drawMultiModalPath(pathData, true));

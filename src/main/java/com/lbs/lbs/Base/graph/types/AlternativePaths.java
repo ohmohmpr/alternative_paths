@@ -17,6 +17,7 @@ public class AlternativePaths<V, E extends WeightedArcData> {
 	public boolean LimitedSharingtested = false;
 	public boolean passLocalOptimality = false;
 	public boolean LocalOptimalitytested = false;
+	public DiGraphNode<V, E> viaNode = null;
 	
 	public ArrayList<DiGraphNode<V, E>> path;
 	public ArrayList<DiGraphArc<V, E>> pathArcs;
@@ -24,12 +25,13 @@ public class AlternativePaths<V, E extends WeightedArcData> {
 	public AlternativePaths(
 			int commonNodeID, double dist,
 			List<DiGraphNode<V, E>> path, 
-			List<DiGraphArc<V, E>> pathArcs) {
+			List<DiGraphArc<V, E>> pathArcs, 
+			DiGraphNode<V, E> viaNode) {
 		this.commonNodeID = commonNodeID;
 		this.dist = dist;
 		this.path = new ArrayList<DiGraphNode<V, E>>(path);
 		this.pathArcs = new ArrayList<DiGraphArc<V, E>>(pathArcs);
-		
+		this.viaNode = viaNode;
 	}
 	
     public double getdist() {

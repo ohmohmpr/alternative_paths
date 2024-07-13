@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.lbs.lbs.Entity.TransportPath;
 import com.lbs.lbs.Service.ShortestPathService;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import org.locationtech.jts.geom.Coordinate;
 import org.springframework.http.HttpStatus;
@@ -112,7 +113,7 @@ public class ShortestPathController {
 //    }
 
     @GetMapping("/alternativepath-shortestpathbidi")
-    public ResponseEntity<List< Triple<Double,Double,List<Coordinate>> >> simpleShortestPathBDVController(@RequestParam double lat1,@RequestParam double lon1,
+    public ResponseEntity<List< Triple<Double,Double, Triple<List<Coordinate>, Double, Coordinate>> >> simpleShortestPathBDVController(@RequestParam double lat1,@RequestParam double lon1,
     		@RequestParam double lat2,@RequestParam double lon2,
     		@RequestParam int numPaths,@RequestParam double limitedSharing,
     		@RequestParam double localOptimality,@RequestParam double UBS){
@@ -121,7 +122,7 @@ public class ShortestPathController {
          * returns list of the shortest path coordinates as latitude and longitude*/
 
         try {
-        	List< Triple<Double,Double,List<Coordinate>> > alt = ShortestPathService.getAlternativeRoutesBDV(lat1, lon1, lat2, lon2, numPaths, limitedSharing, localOptimality, UBS);
+        	List< Triple<Double,Double, Triple<List<Coordinate>, Double, Coordinate>> > alt = ShortestPathService.getAlternativeRoutesBDV(lat1, lon1, lat2, lon2, numPaths, limitedSharing, localOptimality, UBS);
 
             return new ResponseEntity(alt, HttpStatus.OK);
         } catch (Exception e){

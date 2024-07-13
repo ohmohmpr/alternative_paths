@@ -50,6 +50,7 @@ public class BDV<V, E extends WeightedArcData> {
 	protected AlternativePaths<V, E> optimalShortestPath = null;
 	public ArrayList<AlternativePaths<V, E>> alternativePaths;
 	public Map<Integer, AlternativePaths<V,E>> id_dist_F_B;
+	public DiGraphNode<V, E> viaNodeList;
 
 	//alternative path conditions
 	protected int numPaths = 3; // number of alternative paths.
@@ -183,6 +184,7 @@ public class BDV<V, E extends WeightedArcData> {
 			curr_dist_B = dist_B[u_B.getId()];
 
 			if (currentLength > (1 + epsilon) * optimalLength) {
+				System.out.println((1 + epsilon) * optimalLength);
 				break;
 			}
 			// top_s < top_t -> Forward search
@@ -198,11 +200,11 @@ public class BDV<V, E extends WeightedArcData> {
 					commonNodeID = v.getId();
 					currentLength =  dist_F[commonNodeID] + dist_B[commonNodeID];
 					// if the node got already investigated but not visited in the backward search -> new path
-					if (items_B[v.getId()] != null) {
+					if (items_B[v.getId()] != null && currentLength < (1 + epsilon) * optimalLength) {
 
 						AlternativePaths<V, E> alternativePath = new AlternativePaths<>(
 								commonNodeID, currentLength,
-								getPath(), getPathArcs()
+								getPath(), getPathArcs(), v
 						);
 
 						// check whether the path is the optimal path
@@ -229,11 +231,11 @@ public class BDV<V, E extends WeightedArcData> {
 					// if the node got already investigated but not visited in the forward search -> new path
 					commonNodeID = v.getId();
 					currentLength =  dist_F[commonNodeID] + dist_B[commonNodeID];
-	 				if (items_F[v.getId()] != null) {
+	 				if (items_F[v.getId()] != null  && currentLength < (1 + epsilon) * optimalLength) {
 
 						AlternativePaths<V, E> alternativePath = new AlternativePaths<>(
 								commonNodeID, currentLength,
-								getPath(), getPathArcs()
+								getPath(), getPathArcs(), v
 						);
 					
 						// check whether the path is the optimal path 
@@ -343,7 +345,7 @@ public class BDV<V, E extends WeightedArcData> {
 	}
 	
 	
-	public ArrayList<Triple<Double, Double, AlternativePaths<V,E>>>  getPaths() throws Exception {
+	public ArrayList<Triple<Double, Double, Triple< AlternativePaths<V,E>, Double, DiGraphNode<V, E>>> >  getPaths() throws Exception {
 
 		//initialize:
 		result.add(optimalShortestPath);
@@ -382,13 +384,14 @@ public class BDV<V, E extends WeightedArcData> {
 			
 		}
 		// print the result in the console
-		ArrayList<Triple<Double, Double, AlternativePaths<V,E>>> showResult = 
-				new ArrayList<Triple<Double, Double, AlternativePaths<V,E>>>(); ;
+		ArrayList<Triple<Double, Double, Triple<AlternativePaths<V,E>, Double, DiGraphNode<V, E>>> > showResult = 
+				new ArrayList<Triple<Double, Double, Triple<AlternativePaths<V,E>, Double, DiGraphNode<V, E>>> >(); ;
 		System.out.println("\nRESULTs");
 		System.out.println("path,               Dist,             Cost");
 		for (AlternativePaths<V, E> path: result) {
 			System.out.println("path: " + path.getdist() + " " + path.getCostFunction());
-			showResult.add(Triple.of(path.getdist(), path.getCostFunction(), path));
+			showResult.add(Triple.of(path.getdist(), path.getCostFunction(), Triple.of(path, 0.0, path.viaNode)));
+			
 		}
 		
 		return showResult;
