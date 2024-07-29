@@ -11,7 +11,7 @@ put presentation slides here.
 
 ## Production
 
-[Web](https://geonet.igg.uni-bonn.de/lbsproject-lara-ohm/  "title" target="_blank")
+[Web](https://geonet.igg.uni-bonn.de/lbsproject-lara-ohm/)
 
 ### Usage 
 Show how to use the map.
