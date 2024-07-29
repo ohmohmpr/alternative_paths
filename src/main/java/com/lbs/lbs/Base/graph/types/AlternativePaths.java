@@ -1,12 +1,10 @@
 package com.lbs.lbs.Base.graph.types;
 
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.lbs.lbs.Base.graph.DiGraph.DiGraphArc;
 import com.lbs.lbs.Base.graph.DiGraph.DiGraphNode;
-import com.lbs.lbs.Base.graph.types.multimodal.GeofabrikData;
 
 public class AlternativePaths<V, E extends WeightedArcData> {
 
